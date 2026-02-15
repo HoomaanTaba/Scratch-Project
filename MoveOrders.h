@@ -1,6 +1,3 @@
-//
-// Created by Fazel on 1/27/2026.
-//
 
 #ifndef MOVEORDERS_MOVEORDERS_H
 #define MOVEORDERS_MOVEORDERS_H
