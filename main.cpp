@@ -1,5 +1,4 @@
-#include "iostream"
-#include "cmath"
+#include "bits/stdc++.h"
 #include "UI_Objects.h"
 #include "Motion.h"
 #include "Looks.h"
@@ -9,6 +8,12 @@
 #include "Sensing.h"
 #include "Operators.h"
 #include "Variables.h"
+using namespace std;
+
+vector<DraggableBlock> workspaceBlocks;
+
+vector<DraggableBlock> EventMenuBlocks;
+vector<DraggableBlock> SoundMenuBlocks;
 
 int main(int argc, char* argv[]) {
     // SDL Initialize
@@ -51,12 +56,17 @@ int main(int argc, char* argv[]) {
     // Drawing Scratch Sprite!
     Sprite cat{};
     cat.texture = loadTexture(m_renderer, "cat.png");
-    cat.rect = {400,250,200,200};
+    cat.rect = {700,250,150,150};
     cat.dragging = false;
     CodeTab.active = true;
 
     // Drawing the logo (top, right, corner)
     SDL_Texture* logoTex = loadTexture(m_renderer, "logo.png");
+
+    // Events - CodeMenu
+    initEvents(m_renderer);
+    // Sound - CodeMenu
+    initSound(m_renderer);
 
     while(running) {
         while(SDL_PollEvent(&e)) {
@@ -94,9 +104,50 @@ int main(int argc, char* argv[]) {
                 }
                 else if(isInside(mx,my,motionBtn.area)) {
                     motionBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = looksBtn.active = soundBtn.active = controlBtn.active = sensingBtn.active = operatorsBtn.active = variablesBtn.active = false;
                 }
-                // else: continue
+                else if(isInside(mx,my,looksBtn.area)) {
+                    looksBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = motionBtn.active = soundBtn.active = controlBtn.active = sensingBtn.active = operatorsBtn.active = variablesBtn.active = false;
+                }
+                else if(isInside(mx,my,soundBtn.area)) {
+                    soundBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = looksBtn.active = motionBtn.active = controlBtn.active = sensingBtn.active = operatorsBtn.active = variablesBtn.active = false;
+                }
+                else if(isInside(mx,my,eventsBtn.area)) {
+                    eventsBtn.active = true;
+                    // make other menus unactive
+                    motionBtn.active = looksBtn.active = soundBtn.active = controlBtn.active = sensingBtn.active = operatorsBtn.active = variablesBtn.active = false;
+                }
+                else if(isInside(mx,my,controlBtn.area)) {
+                    controlBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = looksBtn.active = soundBtn.active = motionBtn.active = sensingBtn.active = operatorsBtn.active = variablesBtn.active = false;
+                }
+                else if(isInside(mx,my,sensingBtn.area)) {
+                    sensingBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = looksBtn.active = soundBtn.active = controlBtn.active = motionBtn.active = operatorsBtn.active = variablesBtn.active = false;
+                }
+                else if(isInside(mx,my,operatorsBtn.area)) {
+                    operatorsBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = looksBtn.active = soundBtn.active = controlBtn.active = sensingBtn.active = motionBtn.active = variablesBtn.active = false;
+                }
+                else if(isInside(mx,my,variablesBtn.area)) {
+                    variablesBtn.active = true;
+                    // make other menus unactive
+                    eventsBtn.active = looksBtn.active = soundBtn.active = controlBtn.active = sensingBtn.active = operatorsBtn.active = motionBtn.active = false;
+                }
             }
+            // Events - CodeMenu
+            if(CodeTab.active && eventsBtn.active)
+                handleEventBlock(e, CodeTab.active, eventsBtn.active);
+            else if(CodeTab.active && soundBtn.active)
+                handleSoundBlock(e, CodeTab.active, soundBtn.active);
         }
         // Render codes
         SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
@@ -125,12 +176,15 @@ int main(int argc, char* argv[]) {
             drawSideButton(m_renderer, font, sensingBtn);
             drawSideButton(m_renderer, font, operatorsBtn);
             drawSideButton(m_renderer, font, variablesBtn);
+
+            renderEventBlocks(m_renderer, font, CodeTab.active, eventsBtn.active);
+            renderSoundBlocks(m_renderer, font, CodeTab.active, soundBtn.active);
         }
 
         // Drawing character
         drawCat(m_renderer, cat);
 
-
+        // Presenting and delay
         SDL_RenderPresent(m_renderer);
         SDL_Delay(16);
     }
