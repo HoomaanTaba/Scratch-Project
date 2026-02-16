@@ -1,5 +1,4 @@
-#include "iostream"
-#include "cmath"
+#include "bits/stdc++.h"
 #include "UI_Objects.h"
 #include "Motion.h"
 #include "Looks.h"
@@ -9,6 +8,10 @@
 #include "Sensing.h"
 #include "Operators.h"
 #include "Variables.h"
+using namespace std;
+
+vector<DraggableBlock> workspaceBlocks;
+vector<DraggableBlock> menuBlocks;
 
 int main(int argc, char* argv[]) {
     // SDL Initialize
@@ -58,6 +61,9 @@ int main(int argc, char* argv[]) {
     // Drawing the logo (top, right, corner)
     SDL_Texture* logoTex = loadTexture(m_renderer, "logo.png");
 
+    // Events - CodeMenu
+    initEvents(m_renderer);
+
     while(running) {
         while(SDL_PollEvent(&e)) {
             // Events:
@@ -95,8 +101,9 @@ int main(int argc, char* argv[]) {
                 else if(isInside(mx,my,motionBtn.area)) {
                     motionBtn.active = true;
                 }
-                // else: continue
             }
+            // Events - CodeMenu
+            handleEventBlock(e, CodeTab.active, eventsBtn.active);
         }
         // Render codes
         SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
@@ -125,12 +132,14 @@ int main(int argc, char* argv[]) {
             drawSideButton(m_renderer, font, sensingBtn);
             drawSideButton(m_renderer, font, operatorsBtn);
             drawSideButton(m_renderer, font, variablesBtn);
+
+            renderEventBlocks(m_renderer,font,CodeTab.active, eventsBtn.active);
         }
 
         // Drawing character
         drawCat(m_renderer, cat);
 
-
+        // Presenting and delay
         SDL_RenderPresent(m_renderer);
         SDL_Delay(16);
     }
