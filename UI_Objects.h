@@ -3,7 +3,6 @@
 #ifndef INC_14041016_UI_OBJECTS_H
 #define INC_14041016_UI_OBJECTS_H
 
-
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfx.h"
 #include "SDL2/SDL_image.h"
@@ -36,7 +35,6 @@ bool mouseOnSprite(int mx, int my, Sprite& s) {
            my >= s.rect.y && my <= s.rect.y + s.rect.h;
 }
 void handleSpriteEvent(Sprite& s, SDL_Event& e) {
-
     if (e.type == SDL_MOUSEBUTTONDOWN &&
         e.button.button == SDL_BUTTON_LEFT) {
 
@@ -181,5 +179,30 @@ void drawSideButton(SDL_Renderer* r, TTF_Font* font, SideButton& btn) {
 
     drawTextCentered(r,font,btn.label,textContainer , textColor);
 }
+
+// Define blocks struct
+struct DraggableBlock {
+    SDL_Texture* texture;
+    SDL_Rect rect;
+    bool dragging = false;
+    int offsetX = 0, offsetY = 0;
+    // Checking that is it a head block or not
+    bool isHat;
+    int parentID = -1;
+    int id;
+    // DropDown Support
+    bool hasDropdown = false;
+    vector<string> dropdownOptions;
+    int selectedOption = 0;
+    bool dropdownOpen = false;
+    SDL_Rect dropdownRect;
+};
+
+
+extern vector<DraggableBlock> workspaceBlocks;
+
+extern vector<DraggableBlock> EventMenuBlocks;
+extern vector<DraggableBlock> SoundMenuBlocks;
+
 
 #endif //INC_14041016_UI_OBJECTS_H
