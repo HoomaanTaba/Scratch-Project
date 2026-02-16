@@ -89,7 +89,7 @@ void END_REPEAT_BLOCK(Operator_Block& blc,ExucationContext&ctx, int &ip,vector<O
         Block& rep=prog[beginIndex];
         rep.valueI--;
         if (rep.valueI>0) {
-            ip.beginIndex-1;
+            ip=beginIndex-1;
         }
         //continue the loop until valueI is over
     }
@@ -111,7 +111,7 @@ void REPEAT_UNTIL_BLOCK(Operator_Block& blc,ExucationContext& ctx,int& ip,vector
 }
 
 void CALL_COMMAND(Operator_Block& blc,ExucationContext& ctx) {
-    if (blc.commandFn) ins.commandFn(ctx);
+    if (blc.commandFn) blc.commandFn(ctx);
 }
 
 void CALL_CONDITION(Operator_Block& blc,ExucationContext& ctx,int& ip,vector<Operator_Block>&prog) {
@@ -169,3 +169,4 @@ bool PreprocessScript(
     if (repeatTop!=-1) return false;
     return true;
 }
+
