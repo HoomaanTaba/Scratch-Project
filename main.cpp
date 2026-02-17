@@ -14,6 +14,7 @@ vector<DraggableBlock> workspaceBlocks;
 
 vector<DraggableBlock> EventMenuBlocks;
 vector<DraggableBlock> SoundMenuBlocks;
+vector<DraggableBlock> LooksMenuBlocks;
 
 int main(int argc, char* argv[]) {
     // SDL Initialize
@@ -67,6 +68,8 @@ int main(int argc, char* argv[]) {
     initEvents(m_renderer);
     // Sound - CodeMenu
     initSound(m_renderer);
+    // Looks = CodeMenu
+    initLooks(m_renderer);
 
     while(running) {
         while(SDL_PollEvent(&e)) {
@@ -146,8 +149,12 @@ int main(int argc, char* argv[]) {
             // Events - CodeMenu
             if(CodeTab.active && eventsBtn.active)
                 handleEventBlock(e, CodeTab.active, eventsBtn.active);
+            // Sound - CodeMenu
             else if(CodeTab.active && soundBtn.active)
                 handleSoundBlock(e, CodeTab.active, soundBtn.active);
+            // Looks - CodeMenu
+            else if(CodeTab.active && looksBtn.active)
+                handleLooksBlock(e,CodeTab.active,looksBtn.active);
         }
         // Render codes
         SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
@@ -179,6 +186,7 @@ int main(int argc, char* argv[]) {
 
             renderEventBlocks(m_renderer, font, CodeTab.active, eventsBtn.active);
             renderSoundBlocks(m_renderer, font, CodeTab.active, soundBtn.active);
+            renderLooksBlocks(m_renderer, font, CodeTab.active, looksBtn.active);
         }
 
         // Drawing character
