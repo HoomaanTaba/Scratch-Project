@@ -44,7 +44,6 @@ void handleSpriteEvent(Sprite& s, SDL_Event& e) {
         if (mouseOnSprite(mx, my, s)) {
             s.dragging = true;
 
-            // فاصله‌ی کلیک تا گوشه‌ی Sprite
             s.offsetX = mx - s.rect.x;
             s.offsetY = my - s.rect.y;
         }
@@ -203,6 +202,7 @@ extern vector<DraggableBlock> workspaceBlocks;
 
 extern vector<DraggableBlock> EventMenuBlocks;
 extern vector<DraggableBlock> SoundMenuBlocks;
+extern vector<DraggableBlock> LooksMenuBlocks;
 
 
 #endif //INC_14041016_UI_OBJECTS_H
