@@ -203,6 +203,11 @@ extern vector<DraggableBlock> workspaceBlocks;
 extern vector<DraggableBlock> EventMenuBlocks;
 extern vector<DraggableBlock> SoundMenuBlocks;
 extern vector<DraggableBlock> LooksMenuBlocks;
+extern vector<DraggableBlock> MotionMenuBlocks;
+extern vector<DraggableBlock> ControlMenuBlocks;
+extern vector<DraggableBlock> SensingMenuBlocks;
+extern vector<DraggableBlock> OperatorMenuBlocks;
+extern vector<DraggableBlock> VariablesMenuBlocks;
 
 
 #endif //INC_14041016_UI_OBJECTS_H
