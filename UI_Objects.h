@@ -8,24 +8,19 @@
 // Scratch Project - UI Objects
 
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL2_gfx.h"
-#include "SDL2/SDL_image.h"
-#include "SDL2/SDL_ttf.h"
-#include "string"
-#include "vector"
+#include <SDL2/SDL.h>
+#include "SDLInclude.h"
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <string>
+#include <vector>
+#include <map>
 using namespace std;
 
 // Creating Scratch Character
 
-struct DisplayMode {
-    int w;
-    int h;
-};
-
-DisplayMode DM = {1920, 1080};
-inline int W = DM.w;
-inline int H = DM.h;
+const int W = 500;
+const int H = 500;
 
 struct Sprite {
     SDL_Texture* texture;
@@ -37,8 +32,9 @@ struct Sprite {
     double direction = 0;
 
     vector <SDL_Texture*> costume;
+    vector <string> costumeNames;
     int currentCostume = 0;
-
+    string input_message;
     string message;
     int messageType;
     // 0 = Noun
@@ -51,6 +47,17 @@ struct Sprite {
     double size = 100;
     double colorEffect = 0;
     int layer = 0;
+
+    map <string, double> effects;
+
+};
+
+struct Stage {
+    //lists of backdrops' texture
+    vector<SDL_Texture*> backdrops;
+    vector<string> backdropNames;
+    int currentBackdrop = 0;
+    vector <Sprite*> sprites;
 };
 
 SDL_Texture* loadTexture(SDL_Renderer* renderer, const string& path) {
@@ -224,12 +231,18 @@ struct DraggableBlock {
     bool isHat;
     int parentID = -1;
     int id;
+
+    int blockType;
     // DropDown Support
     bool hasDropdown = false;
     vector<string> dropdownOptions;
     int selectedOption = 0;
     bool dropdownOpen = false;
     SDL_Rect dropdownRect;
+
+    bool hasNumberInput = false;
+    double inputValue = 0;
+    string inputMessage;
 };
 
 
@@ -237,6 +250,14 @@ extern vector<DraggableBlock> workspaceBlocks;
 
 extern vector<DraggableBlock> EventMenuBlocks;
 extern vector<DraggableBlock> SoundMenuBlocks;
+extern vector<DraggableBlock> MotionMenuBlocks;
+extern vector<DraggableBlock> LooksMenuBlocks;
+extern vector<DraggableBlock> SoundMenuBlocks;
+extern vector<DraggableBlock> EventMenuBlocks;
+extern vector<DraggableBlock> ControlMenuBlocks;
+extern vector<DraggableBlock> SensingMenuBlocks;
+extern vector<DraggableBlock> OperatorMenuBlocks;
+extern vector<DraggableBlock> VariablesMenuBlocks;
 
 
 #endif //SCRATCH_UI_OBJECTS_H
