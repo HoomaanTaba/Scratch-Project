@@ -44,7 +44,7 @@ void initSound(SDL_Renderer* renderer) {
     // play sound until done block
     DraggableBlock playUntilBlock = {
             playUntilTex,
-            {80, startY+gap, 170, 40},
+            {80, startY+gap, 140, 40},
             false, 0, 0,
             false,
             -1,
@@ -60,7 +60,7 @@ void initSound(SDL_Renderer* renderer) {
     // stop all sounds
     SoundMenuBlocks.push_back({
         stopAllTex,
-        {80, startY+gap*2, 140, 40},
+        {80, startY+gap*2, 100, 40},
         false,0,0,
         false,
         -1,
@@ -210,6 +210,18 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
                 // Dragging the main block
                 workspaceBlocks[i].rect.x = mx - workspaceBlocks[i].offsetX;
                 workspaceBlocks[i].rect.y = my - workspaceBlocks[i].offsetY;
+
+                // no come in stage
+                if(workspaceBlocks[i].rect.x + workspaceBlocks[i].rect.w > 600)
+                    workspaceBlocks[i].rect.x = 600 - workspaceBlocks[i].rect.w;
+
+                // no come in title bar
+                if(workspaceBlocks[i].rect.y < 90)
+                    workspaceBlocks[i].rect.y = 90;
+
+                // no exit from the bottom
+                if(workspaceBlocks[i].rect.y + workspaceBlocks[i].rect.h > 610)
+                    workspaceBlocks[i].rect.y = 610 - workspaceBlocks[i].rect.h;
 
                 int diffX = workspaceBlocks[i].rect.x - oldX;
                 int diffY = workspaceBlocks[i].rect.y - oldY;
