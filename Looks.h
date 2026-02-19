@@ -291,6 +291,19 @@ void handleLooksBlock(SDL_Event& e, bool codeTabActive, bool looksBtnActive) {
                 workspaceBlocks[i].rect.x = mx - workspaceBlocks[i].offsetX;
                 workspaceBlocks[i].rect.y = my - workspaceBlocks[i].offsetY;
 
+
+                // no come in stage
+                if(workspaceBlocks[i].rect.x + workspaceBlocks[i].rect.w > 600)
+                    workspaceBlocks[i].rect.x = 600 - workspaceBlocks[i].rect.w;
+
+                // no come in title bar
+                if(workspaceBlocks[i].rect.y < 90)
+                    workspaceBlocks[i].rect.y = 90;
+
+                // no exit from the bottom
+                if(workspaceBlocks[i].rect.y + workspaceBlocks[i].rect.h > 610)
+                    workspaceBlocks[i].rect.y = 610 - workspaceBlocks[i].rect.h;
+
                 int diffX = workspaceBlocks[i].rect.x - oldX;
                 int diffY = workspaceBlocks[i].rect.y - oldY;
 
