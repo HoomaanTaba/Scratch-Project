@@ -56,8 +56,18 @@ void handleSpriteEvent(Sprite& s, SDL_Event& e) {
     }
 
     if (e.type == SDL_MOUSEMOTION && s.dragging) {
-        s.rect.x = e.motion.x - s.offsetX;
-        s.rect.y = e.motion.y - s.offsetY;
+        int newX = e.motion.x - s.offsetX;
+        int newY = e.motion.y - s.offsetY;
+
+        if(newY < 50)
+            newY = 50;
+        if(newY + s.rect.h > 700)
+            newY = 700 - s.rect.h;
+        if(newX < 630)
+            newX = 630;
+
+        s.rect.x = newX;
+        s.rect.y = newY;
     }
 }
 
