@@ -21,6 +21,9 @@ vector<DraggableBlock> SensingMenuBlocks;
 vector<DraggableBlock> OperatorMenuBlocks;
 vector<DraggableBlock> VariablesMenuBlocks;
 
+SDL_Rect workspaceArea = {70,50,550,700}; // code menu engine area
+SDL_Rect stageArea = {700,90,424,520}; // sprite area
+
 int main(int argc, char* argv[]) {
     // SDL Initialize
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
@@ -77,6 +80,14 @@ int main(int argc, char* argv[]) {
     initLooks(m_renderer);
     // Motion
     initMotion(m_renderer);
+    // Control
+    initControl(m_renderer);
+    // Operators
+    initOperators(m_renderer);
+    // Variables
+    initVariables(m_renderer);
+    // Sensing
+    initSensing(m_renderer);
 
     while(running) {
         while(SDL_PollEvent(&e)) {
@@ -162,14 +173,35 @@ int main(int argc, char* argv[]) {
             // Looks - CodeMenu
             else if(CodeTab.active && looksBtn.active)
                 handleLooksBlock(e,CodeTab.active,looksBtn.active);
-            // Motion = CodeMenu
+            // Motion - CodeMenu
             else if(CodeTab.active && motionBtn.active)
                 handleMotionBlock(e,CodeTab.active,motionBtn.active);
+            // Control - CodeMenu
+            else if(CodeTab.active && controlBtn.active)
+                handleControlBlock(e,CodeTab.active,controlBtn.active);
+            // Operators
+            else if(CodeTab.active && operatorsBtn.active)
+                handleOperatorBlock(e,CodeTab.active,operatorsBtn.active);
+            // Variables
+            else if(CodeTab.active && variablesBtn.active)
+                handleVariablesBlock(e, CodeTab.active, variablesBtn.active);
+            // Sensing
+            else if(CodeTab.active && sensingBtn.active)
+                handleSensingBlock(e,CodeTab.active,sensingBtn.active);
         }
         // Render codes
         SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
         SDL_RenderClear(m_renderer);
         drawTitleBar(m_renderer, m_window);
+
+        // workspace background (gray)
+        SDL_SetRenderDrawColor(m_renderer, 235, 235,235,255);
+        SDL_RenderFillRect(m_renderer, &workspaceArea);
+
+        // stage background (white)
+        SDL_SetRenderDrawColor(m_renderer, 255,255,255,255);
+        SDL_RenderFillRect(m_renderer, &stageArea);
+
 
         // Drawing the logo
         drawStaticImage(m_renderer, logoTex, 20, 2, 110, 46);
@@ -194,10 +226,24 @@ int main(int argc, char* argv[]) {
             drawSideButton(m_renderer, font, operatorsBtn);
             drawSideButton(m_renderer, font, variablesBtn);
 
-            renderEventBlocks(m_renderer, font, CodeTab.active, eventsBtn.active);
-            renderSoundBlocks(m_renderer, font, CodeTab.active, soundBtn.active);
-            renderLooksBlocks(m_renderer, font, CodeTab.active, looksBtn.active);
-            renderMotionBlocks(m_renderer, font, CodeTab.active, motionBtn.active);
+
+            if(eventsBtn.active)
+                renderEventBlocks(m_renderer, font, CodeTab.active, eventsBtn.active);
+            else if(soundBtn.active)
+                renderSoundBlocks(m_renderer, font, CodeTab.active, soundBtn.active);
+            else if(looksBtn.active)
+                renderLooksBlocks(m_renderer, font, CodeTab.active, looksBtn.active);
+            else if(motionBtn.active)
+                renderMotionBlocks(m_renderer, font, CodeTab.active, motionBtn.active);
+            else if(controlBtn.active)
+                renderControlBlocks(m_renderer, font, CodeTab.active, controlBtn.active);
+            else if(operatorsBtn.active)
+                renderOperatorBlocks(m_renderer, font, CodeTab.active, operatorsBtn.active);
+            else if(variablesBtn.active)
+                renderVariablesBlocks(m_renderer, font, CodeTab.active, variablesBtn.active);
+            else if(sensingBtn.active)
+                renderSensingBlocks(m_renderer, font, CodeTab.active, sensingBtn.active);
+
         }
 
         // Drawing character
