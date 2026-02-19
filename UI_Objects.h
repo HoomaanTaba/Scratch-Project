@@ -27,8 +27,8 @@ struct Sprite {
     SDL_Rect rect;
     bool dragging;
     bool visible;
-    double x;
-    double y;
+    double x = 300;
+    double y = 225;
     double direction = 0;
 
     vector <SDL_Texture*> costume;
@@ -50,6 +50,18 @@ struct Sprite {
 
     map <string, double> effects;
 
+    void render(SDL_Renderer* renderer) {
+        if (!visible) return;
+
+        SDL_RenderCopyEx(
+            renderer,
+            texture,
+            nullptr,
+            &rect,
+            direction,
+            nullptr,
+            SDL_FLIP_NONE);
+    }
 };
 
 struct Stage {
@@ -69,7 +81,14 @@ SDL_Texture* loadTexture(SDL_Renderer* renderer, const string& path) {
 }
 void drawCat(SDL_Renderer* renderer, Sprite& s) {
     if (s.texture)
-        SDL_RenderCopy(renderer, s.texture, nullptr, &s.rect);
+        SDL_RenderCopyEx(
+            renderer,
+            s.texture,
+            nullptr,
+            &s.rect,
+            s.direction,
+            nullptr,
+            SDL_FLIP_NONE);
 }
 bool mouseOnSprite(int mx, int my, Sprite& s) {
     return mx >= s.rect.x && mx <= s.rect.x + s.rect.w &&
@@ -242,6 +261,9 @@ struct DraggableBlock {
 
     bool hasNumberInput = false;
     double inputValue = 0;
+
+    double inputValue2;
+    bool hasSecondNumberInput = false;
     string inputMessage;
 };
 

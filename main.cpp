@@ -23,6 +23,7 @@ void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
             break;
 
         switch (block->blockType) {
+            // Looks
             case BLOCK_SHOW:
                 show(sprite);
                 break;
@@ -96,7 +97,44 @@ void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
             case BLOCK_REPORT_SIZE:
                 get_size(sprite);
                 break;
+
+            //Motion
+            case BLOCK_MOVE:
+                move_n_steps(sprite, block->inputValue);
+                break;
+            case BLOCK_TURN_RIGHT:
+                turn_angle_right(sprite, block->inputValue);
+                break;
+            case BLOCK_TURN_LEFT:
+                turn_angle_left(sprite, block->inputValue);
+                break;
+            case BLOCK_GO_TO_XY:
+                go_to_x_and_y(sprite, block->inputValue, block->inputValue2);
+                break;
+            case BLOCK_GO_TO_RANDOM:
+                go_to_randomposition(sprite);
+                break;
+            case BLOCK_GO_TO_MOUSE:
+                go_to_mouseposition(sprite);
+                break;
+            case BLOCK_CHANGE_X:
+                change_x_by(sprite, block->inputValue);
+                break;
+            case BLOCK_CHANGE_Y:
+                change_y_by(sprite, block->inputValue);
+                break;
+            case BLOCK_POINT_DIRECTION:
+                point_in_direction(sprite, block->inputValue);
+                break;
+            case BLOCK_SET_X:
+                set_x_to(sprite, block->inputValue);
+                break;
+            case BLOCK_SET_Y:
+                set_y_to(sprite, block->inputValue);
+                break;
         }
+        sprite.rect.x = (int)sprite.x;
+        sprite.rect.y = (int)sprite.y;
         //finding next block
         int nextID = -1;
         for (auto& b : workspaceBlocks) {
@@ -163,6 +201,8 @@ int main(int argc, char* argv[]) {
     cat.visible = true;
     cat.texture = loadTexture(m_renderer, "cat.png");
     cat.rect = {700,250,150,150};
+    cat.x = cat.rect.x;
+    cat.y = cat.rect.y;
     cat.dragging = false;
     Stage stage;
     stage.backdrops.push_back(loadTexture(m_renderer, "backdrop1.png"));
@@ -186,7 +226,7 @@ int main(int argc, char* argv[]) {
     // Motion
     initMotion(m_renderer);
 
-
+    srand(time(NULL));
     while(running) {
         while(SDL_PollEvent(&e)) {
             // Events:
