@@ -91,18 +91,23 @@ void initLooks(SDL_Renderer* renderer) {
         -1,
         globalLooksBlock++
     };
+    sayForBlock.hasNumberInput = false;
+    sayForBlock.hasSecondNumberInput = true;
+    sayForBlock.hasTextInput = true;
     sayForBlock.blockType = BLOCK_SAY_FOR;
     LooksMenuBlocks.push_back(sayForBlock);
 
     // sayHello
     DraggableBlock sayBlock = {
         sayHelloTex,
-        {80, startY+gap+22, 80, 40},
+        {80, startY+gap*2, 80, 40},
         false, 0,0,
         false,
         -1,
         globalLooksBlock++
     };
+    sayBlock.hasTextInput = true;
+    sayBlock.hasNumberInput = false;
     sayBlock.blockType = BLOCK_SAY;
     LooksMenuBlocks.push_back(sayBlock);
     //think
@@ -114,12 +119,28 @@ void initLooks(SDL_Renderer* renderer) {
         -1,
         globalLooksBlock++
     };
+    thinkForBlock.hasTextInput = true;
+    thinkForBlock.hasSecondNumberInput = true;
+    thinkForBlock.hasNumberInput = false;
     thinkForBlock.blockType = BLOCK_THINK_FOR;
     LooksMenuBlocks.push_back(thinkForBlock);
+
+    DraggableBlock thinkBlock = {
+        thinkTex,
+        {80, startY+gap*4, 80, 40},
+        false, 0,0,
+        false,
+        -1,
+        globalLooksBlock++
+    };
+    thinkBlock.hasTextInput = true;
+    thinkBlock.hasNumberInput = false;
+    thinkBlock.blockType = BLOCK_THINK;
+    LooksMenuBlocks.push_back(thinkBlock);
     // switch costume block
     DraggableBlock switchCostumeBlock = {
             switchCostumeTex,
-            {80, startY+gap*4, 210, 45},
+            {80, startY+gap*5, 210, 45},
             false, 0,0,
             false,
             -1,
@@ -135,7 +156,7 @@ void initLooks(SDL_Renderer* renderer) {
     // next costume
     DraggableBlock nextCostumeBlock = {
         nextCostumeTex,
-        {80, startY+gap*5, 100, 45},
+        {80, startY+gap*6, 100, 45},
         false, 0,0,
         false,
         -1,
@@ -146,7 +167,7 @@ void initLooks(SDL_Renderer* renderer) {
 
     DraggableBlock switchBackdropBlock = {
             switchBackdropTex,
-            {80, startY+gap*6, 220, 45},
+            {80, startY+gap*7, 220, 45},
             false,0,0,
             false,
             -1,
@@ -161,7 +182,7 @@ void initLooks(SDL_Renderer* renderer) {
     // next backdrop
     DraggableBlock nextBackdropBlock = {
         nextBackdropTex,
-        {80, startY+gap*7, 100, 45},
+        {80, startY+gap*8, 100, 45},
         false,0,0,
         false,
         -1,
@@ -172,7 +193,7 @@ void initLooks(SDL_Renderer* renderer) {
     // change size by
     DraggableBlock changeSizeBlock = {
         changeSizeTex,
-        {80,startY+gap*8, 170, 45},
+        {80,startY+gap*9, 170, 45},
         false,0,0,
         false,
         -1,
@@ -185,7 +206,7 @@ void initLooks(SDL_Renderer* renderer) {
     // set size to
     DraggableBlock setSizeBlock = {
         setSizeTex,
-        {80,startY+gap*9, 160, 45},
+        {80,startY+gap*10, 160, 45},
         false,0,0,
         false,
         -1,
@@ -198,7 +219,7 @@ void initLooks(SDL_Renderer* renderer) {
     // change color effect
     DraggableBlock changeEffectBlock;
     changeEffectBlock.texture = changeColorTex;
-    changeEffectBlock.rect = {80,startY+gap*10,200,45};
+    changeEffectBlock.rect = {80,startY+gap*11,200,45};
     changeEffectBlock.isHat = false;
     changeEffectBlock.id = globalLooksBlock++;
     changeEffectBlock.blockType = BLOCK_CHANGE_EFFECT;
@@ -212,7 +233,7 @@ void initLooks(SDL_Renderer* renderer) {
     DraggableBlock setEffectBlock;
 
     setEffectBlock.texture = setColorTex;
-    setEffectBlock.rect = {80, startY+gap*11, 190, 45};
+    setEffectBlock.rect = {80, startY+gap*12, 190, 45};
     setEffectBlock.isHat = false;
     setEffectBlock.id = globalLooksBlock++;
     setEffectBlock.blockType = BLOCK_SET_EFFECT_TO;
@@ -225,7 +246,7 @@ void initLooks(SDL_Renderer* renderer) {
     // clear graphic effects
     DraggableBlock clearGraphicEffectsBlock = {
         clearGraphicTex,
-        {80, startY+gap*12, 190, 45},
+        {80, startY+gap*13, 190, 45},
         false,0,0,
         false,
         -1,
@@ -235,33 +256,27 @@ void initLooks(SDL_Renderer* renderer) {
     LooksMenuBlocks.push_back(clearGraphicEffectsBlock);
 
     // show
-    DraggableBlock showBlock = {
-        showTex,
-        {80, startY+gap*13-22, 50, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    };
+    DraggableBlock showBlock;
     showBlock.blockType = BLOCK_SHOW;
+    showBlock.texture = showTex;
+    showBlock.rect = {80, startY+gap*14-22, 50, 45};
+    showBlock.id = globalLooksBlock++;
+    showBlock.isHat = false;
     LooksMenuBlocks.push_back(showBlock);
 
     // hide
-    DraggableBlock hideBlock = {
-        hideTex,
-        {80, startY+gap*14-22, 50, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    };
-    hideBlock.blockType = BLOCK_HIDE;
+    DraggableBlock hideBlock;
+    hideBlock.blockType = BLOCK_SHOW;
+    hideBlock.texture = hideTex;
+    hideBlock.rect = {80, startY+gap*15-22, 50, 45};
+    hideBlock.id = globalLooksBlock++;
+    hideBlock.isHat = false;
     LooksMenuBlocks.push_back(hideBlock);
 
     // go to front layer
     DraggableBlock goToFrontLayerBlock{
         goToFrontTex,
-        {80, startY+gap*15-22, 180, 45},
+        {80, startY+gap*16-22, 180, 45},
         false,0,0,
         false,
         -1,
@@ -272,7 +287,7 @@ void initLooks(SDL_Renderer* renderer) {
 
     DraggableBlock goToBackLayerBlock{
         goToBackTex,
-        {80, startY+gap*16-22, 180, 45},
+        {80, startY+gap*17-22, 180, 45},
         false,0,0,
         false,
         -1,
@@ -285,7 +300,7 @@ void initLooks(SDL_Renderer* renderer) {
 
     DraggableBlock goForwardLayersBlock = {
         goForwardLayersTex,
-        {80, startY+gap*17-22, 200, 45},
+        {80, startY+gap*18-22, 200, 45},
         false,0,0,
         false,
         -1,
@@ -298,7 +313,7 @@ void initLooks(SDL_Renderer* renderer) {
     //go backward layers
     DraggableBlock goBackwardLayersBlock = {
         goBackwardLayersTex,
-        {80, startY+gap*18-22, 200, 45},
+        {80, startY+gap*19-22, 200, 45},
         false,0,0,
         false,
         -1,
@@ -310,7 +325,7 @@ void initLooks(SDL_Renderer* renderer) {
 
     DraggableBlock costumeNumberBlock = {
         costumeNumberTex,
-{80, startY+gap*19-22, 190, 45},
+{80, startY+gap*20-22, 140, 33},
         false,0,0,
         false,
         -1,
@@ -321,7 +336,7 @@ void initLooks(SDL_Renderer* renderer) {
 
     DraggableBlock costumeNameBlock = {
         costumeNameTex,
-{80, startY+gap*20-22, 190, 45},
+{80, startY+gap*21-22, 140, 33},
 false,0,0,
 false,
 -1,
@@ -332,7 +347,7 @@ globalLooksBlock++
 
     DraggableBlock backdropNumberBlock = {
         backdropNumberTex,
-{80, startY+gap*21-22, 190, 45},
+{80, startY+gap*22-22, 140, 33},
 false,0,0,
 false,
 -1,
@@ -343,18 +358,18 @@ globalLooksBlock++
 
     DraggableBlock backdropNameBlock = {
         backdropNameTex,
-{80, startY+gap*22-22, 190, 45},
+{80, startY+gap*23-22, 140, 33},
 false,0,0,
-false,
+  false,
 -1,
-globalLooksBlock++
+     globalLooksBlock++
     };
     backdropNameBlock.blockType = BLOCK_REPORT_BACKDROP_NAME;
     LooksMenuBlocks.push_back(backdropNameBlock);
 
     DraggableBlock sizeBlock = {
         sizeTex,
-{80, startY+gap*23-22, 190, 45},
+{80, startY+gap*24-22, 50, 33},
 false,0,0,
 false,
 -1,
@@ -370,6 +385,25 @@ void handleLooksBlock(SDL_Event& e, bool codeTabActive, bool looksBtnActive) {
     int mx, my;
     SDL_GetMouseState(&mx, &my);
     if(e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+
+        for (auto& b : workspaceBlocks) {
+            if ((b.hasNumberInput || b.hasTextInput) && isInside(mx, my, b.inputRect1)) {
+                b.editingInput1 = true;
+                b.editingInput2 = false;
+                SDL_StartTextInput();
+                return;
+            }
+
+            if (b.hasSecondNumberInput && isInside(mx, my, b.inputRect2)) {
+                b.editingInput1 = false;
+                b.editingInput2 = true;
+                SDL_StartTextInput();
+                return;
+            }
+        }
+
+
+
         mx = e.button.x;
         my = e.button.y;
         for (auto& b : workspaceBlocks) {
@@ -538,6 +572,61 @@ void renderLooksBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActiv
     }
     for(auto& wb : workspaceBlocks) {
         SDL_RenderCopy(renderer, wb.texture, NULL, &wb.rect);
+        if (wb.hasNumberInput || wb.hasTextInput) {
+            wb.inputRect1 = {
+                wb.rect.x + wb.rect.w - 60,
+                wb.rect.y + 12,
+                50,
+                20
+            };
+
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &wb.inputRect1);
+
+            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
+            SDL_RenderDrawRect(renderer, &wb.inputRect1);
+
+            SDL_Color textColor = {0,0,0,255};
+
+            string displayText;
+
+            if (wb.hasTextInput)
+                displayText = wb.inputText1;
+            else {
+                if (!wb.inputText1.empty())
+                    displayText = wb.inputText1;
+                else
+                    displayText = to_string((int)wb.inputValue);
+            }
+
+            drawTextCentered(renderer, font, displayText, wb.inputRect1, textColor);
+
+            if (wb.hasSecondNumberInput) {
+                wb.inputRect2 = {
+                    wb.rect.x + wb.rect.w - 60,
+                    wb.rect.y + 35,
+                    50,
+                    20
+                };
+
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &wb.inputRect2);
+
+                SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
+                SDL_RenderDrawRect(renderer, &wb.inputRect2);
+
+                SDL_Color textColor2 = {0, 0, 0, 255};
+
+                string displayText2;
+
+                if (!wb.inputText2.empty())
+                    displayText2 = wb.inputText2;
+                else
+                    displayText2 = to_string((int)wb.inputValue2);
+
+                drawTextCentered(renderer, font, displayText2, wb.inputRect2, textColor2);
+            }
+        }
         if(wb.hasDropdown) {
             wb.dropdownRect.x = wb.rect.x + wb.rect.w - 100;
             wb.dropdownRect.y = wb.rect.y + 18;
@@ -757,16 +846,20 @@ void update_message(Sprite& s) {
 }
 
 void render_message (Sprite& s, SDL_Renderer* renderer, TTF_Font* font) {
-    if (s.messageType == 0)
+    if (s.messageType == 0 || s.message.empty())
         return;
 
-    SDL_Color textColor = {40, 40, 40};
+    SDL_Color textColor = {40, 40, 40, 255};
 
     SDL_Surface* textSurface = TTF_RenderUTF8_Blended(font, s.message.c_str(), textColor);
     if (!textSurface)
         return;
 
     SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (!textTexture) {
+        SDL_FreeSurface(textSurface);
+        return;
+    }
 
     int textW = textSurface->w;
     int textH = textSurface->h;
@@ -778,7 +871,8 @@ void render_message (Sprite& s, SDL_Renderer* renderer, TTF_Font* font) {
 
     int centerX = s.rect.x + s.rect.w / 2;
     int bubbleX = centerX - bubbleW / 2;
-    int bubbleY = s.y - 130;
+    int bubbleY = s.rect.y - bubbleH - 30;
+
 
     if (s.messageType == 1) {
         roundedBoxRGBA(
@@ -802,15 +896,15 @@ void render_message (Sprite& s, SDL_Renderer* renderer, TTF_Font* font) {
             );
 
         Sint16 vx[3] = {
-            (Sint16)(s.x - 10),
-            (Sint16)(s.y + 10),
-            (Sint16)(s.x)
+            (Sint16)(centerX - 10),
+            (Sint16)(centerX + 10),
+            (Sint16)(centerX)
         };
 
         Sint16 vy[3] = {
             (Sint16)(bubbleY + bubbleH),
             (Sint16)(bubbleY + bubbleH),
-            (Sint16)(bubbleY + bubbleH + 20)
+            (Sint16)(bubbleY + bubbleH + 15)
         };
 
         filledPolygonRGBA(renderer, vx, vy, 3, 255, 255, 255, 255);
@@ -818,42 +912,50 @@ void render_message (Sprite& s, SDL_Renderer* renderer, TTF_Font* font) {
     }
     if (s.messageType == 2) {
 
+        int ellipseCenterY = bubbleY + bubbleH / 2;
+
         filledEllipseRGBA(
         renderer,
-        s.x,
-        bubbleY + bubbleH/2,
+        centerX,
+        ellipseCenterY,
         bubbleW/2,
         bubbleH/2,
         255,255,255,255);
 
         ellipseRGBA(renderer,
-            s.x,
-            bubbleY + bubbleH/2,
-            bubbleW/2,
-            bubbleH/2,
+            centerX,
+            ellipseCenterY,
+          bubbleW/2,
+        bubbleH/2,
             180, 180, 180, 255);
 
+        int mediumX = centerX - bubbleW / 4;
+        int mediumY = bubbleY + bubbleH + 10;
+
         filledCircleRGBA(renderer,
-            s.x - 20,
-            s.y - 50,
-            7,
+            mediumX,
+            mediumY,
+            8,
             255, 255, 255, 255);
 
         circleRGBA(renderer,
-            s.x - 20,
-            s.y - 50,
-            7,
+            mediumX,
+            mediumY,
+            8,
             180, 180, 180, 255);
+
+        int smallX = centerX - bubbleW / 6;
+        int smallY = mediumY + 18;
 
         filledCircleRGBA(renderer,
-            s.x - 10,
-            s.y - 35,
+            smallX,
+            smallY,
             5,
-            180, 180, 180, 255);
+            255, 255, 255, 255);
 
         circleRGBA(renderer,
-            s.x - 10,
-            s.y - 35,
+            smallX,
+            smallY,
             5,
             180, 180, 180, 255);
         }
@@ -861,8 +963,8 @@ void render_message (Sprite& s, SDL_Renderer* renderer, TTF_Font* font) {
     SDL_Rect textRect;
     textRect.w = textW;
     textRect.h = textH;
-    textRect.x = s.x - textW/2;
-    textRect.y = bubbleY + padding/2;
+    textRect.x = bubbleX + (bubbleW - textW) / 2;
+    textRect.y = bubbleY + (bubbleH - textH) / 2;
 
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 

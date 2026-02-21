@@ -9,6 +9,7 @@
 #include "Operators.h"
 #include "Variables.h"
 using namespace std;
+
 void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
     int currentID = startID;
 
@@ -30,12 +31,16 @@ void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
             case BLOCK_HIDE:
                 hide(sprite);
                 break;
-            case BLOCK_CHANGE_SIZE:
-                change_size_by(sprite, block->inputValue);
+            case BLOCK_CHANGE_SIZE: {
+                double val = block->inputText1.empty() ? block->inputValue : atof(block->inputText1.c_str());
+                change_size_by(sprite, val);
                 break;
-            case BLOCK_SET_SIZE:
-                set_size(sprite, block->inputValue);
+            }
+            case BLOCK_SET_SIZE: {
+                double val = block->inputText1.empty() ? block->inputValue : atof(block->inputText1.c_str());
+                set_size(sprite, val);
                 break;
+            }
             case BLOCK_SWITCH_COSTUME:
                 switch_costume_to(sprite, block->selectedOption);
                 break;
@@ -43,17 +48,22 @@ void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
                 switch_backdrop_to(stage, block->selectedOption);
                 break;
             case BLOCK_SAY:
-                say(sprite, block->inputMessage);
+                say(sprite, block->inputText1);
                 break;
-            case BLOCK_SAY_FOR:
-                say_for_seconds(sprite, block->inputMessage, block->inputValue);
+            case BLOCK_SAY_FOR: {
+                int time = atoi(block->inputText2.c_str());
+                say_for_seconds(sprite, block->inputText1, time);
                 break;
+            }
             case BLOCK_THINK:
-                think(sprite, block->inputMessage);
+                think(sprite, block->inputText1);
                 break;
             case BLOCK_THINK_FOR:
-                think_for_seconds(sprite, block->inputMessage, block->inputValue);
+            {
+                int time = atoi(block->inputText2.c_str());
+                think_for_seconds(sprite, block->inputText1, time);
                 break;
+            }
             case BLOCK_NEXT_COSTUME:
                 next_costume(sprite, (int)sprite.costumeNames.size());
                 break;
@@ -82,21 +92,31 @@ void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
             case BLOCK_GO_BACKWARD_LAYERS:
                 go_backward_layers(sprite, stage.sprites, block->inputValue);
                 break;
-            case BLOCK_REPORT_BACKDROP_NUMBER:
-                get_backdrop_number(stage);
+            case BLOCK_REPORT_BACKDROP_NUMBER: {
+                double value = get_backdrop_number(stage);
+                block->reporterOutput = std::to_string(value);
                 break;
-            case BLOCK_REPORT_BACKDROP_NAME:
-                get_backdrop_name(stage);
+            }
+            case BLOCK_REPORT_BACKDROP_NAME: {
+                string name = get_backdrop_name(stage);
+                block->reporterOutput = name;
                 break;
-            case BLOCK_REPORT_COSTUME_NAME:
-                get_costume_name(sprite);
+            }
+            case BLOCK_REPORT_COSTUME_NAME: {
+                string name = get_costume_name(sprite);
+                block->reporterOutput = name;
                 break;
-            case BLOCK_REPORT_COSTUME_NUMBER:
-                get_costume_number(sprite);
+            }
+            case BLOCK_REPORT_COSTUME_NUMBER: {
+                double value = get_costume_number(sprite);
+                block->reporterOutput = std::to_string(value);
                 break;
-            case BLOCK_REPORT_SIZE:
-                get_size(sprite);
+            }
+            case BLOCK_REPORT_SIZE: {
+                double value = get_size(sprite);
+                block->reporterOutput = std::to_string(value);
                 break;
+            }
 
             //Motion
             case BLOCK_MOVE:
@@ -132,6 +152,184 @@ void executeBlockChain(int startID, Sprite& sprite, Stage& stage) {
             case BLOCK_SET_Y:
                 set_y_to(sprite, block->inputValue);
                 break;
+
+
+            // Sensing
+            case BLOCK_TOUCHING: {
+                bool result = false;
+
+                if (block->dropdownOptions[block->selectedOption] == "mouse-pointer")
+                    result = touchingMouse(sprite);
+
+                else if (block->dropdownOptions[block->selectedOption] == "edge")
+                    result = touchingEdge(sprite);
+
+                else {
+                    if (!stage.sprites.empty())
+                        result = touchingSprite(sprite, *stage.sprites[0]);
+                }
+
+                cout << "Touching result: " << result << endl;
+            }
+                break;
+
+            case BLOCK_DISTANCE: {
+                double d = 0;
+
+                if (block->dropdownOptions[block->selectedOption] == "mouse-pointer") {
+                    int mx, my;
+                    SDL_GetMouseState(&mx, &my);
+                    d = distanceTo(sprite.x, sprite.y, mx, my);
+                }
+                else {
+                    if (!stage.sprites.empty())
+                        d = distanceToSprite(sprite, *stage.sprites[0]);
+                }
+
+                cout << "Distance: " << d << endl;
+            }
+                break;
+            case BLOCK_ASK_AND_WAIT:
+                askQuestion(sprite, block->inputMessage);
+                break;
+            case BLOCK_KEY_PRESSED: {
+                SDL_Scancode code = SDL_SCANCODE_SPACE;
+
+                if (block->dropdownOptions[block->selectedOption] == "up arrow")
+                    code = SDL_SCANCODE_UP;
+                else if (block->dropdownOptions[block->selectedOption] == "down arrow")
+                    code = SDL_SCANCODE_DOWN;
+                else if (block->dropdownOptions[block->selectedOption] == "left arrow")
+                    code = SDL_SCANCODE_LEFT;
+                else if (block->dropdownOptions[block->selectedOption] == "right arrow")
+                    code = SDL_SCANCODE_RIGHT;
+                else if (block->dropdownOptions[block->selectedOption] == "space")
+                    code = SDL_SCANCODE_SPACE;
+                else if (block->dropdownOptions[block->selectedOption] == "any")
+                    code = SDL_SCANCODE_RETURN;
+                else if (block->dropdownOptions[block->selectedOption] == "a")
+                    code = SDL_SCANCODE_A;
+                else if (block->dropdownOptions[block->selectedOption] == "b")
+                    code = SDL_SCANCODE_B;
+                else if (block->dropdownOptions[block->selectedOption] == "c")
+                    code = SDL_SCANCODE_C;
+                else if (block->dropdownOptions[block->selectedOption] == "d")
+                    code = SDL_SCANCODE_D;
+                else if (block->dropdownOptions[block->selectedOption] == "e")
+                    code = SDL_SCANCODE_E;
+                else if (block->dropdownOptions[block->selectedOption] == "f")
+                    code = SDL_SCANCODE_F;
+                else if (block->dropdownOptions[block->selectedOption] == "g")
+                    code = SDL_SCANCODE_G;
+                else if (block->dropdownOptions[block->selectedOption] == "h")
+                    code = SDL_SCANCODE_H;
+                else if (block->dropdownOptions[block->selectedOption] == "i")
+                    code = SDL_SCANCODE_I;
+                else if (block->dropdownOptions[block->selectedOption] == "j")
+                    code = SDL_SCANCODE_J;
+                else if (block->dropdownOptions[block->selectedOption] == "k")
+                    code = SDL_SCANCODE_K;
+                else if (block->dropdownOptions[block->selectedOption] == "l")
+                    code = SDL_SCANCODE_L;
+                else if (block->dropdownOptions[block->selectedOption] == "m")
+                    code = SDL_SCANCODE_M;
+                else if (block->dropdownOptions[block->selectedOption] == "n")
+                    code = SDL_SCANCODE_N;
+                else if (block->dropdownOptions[block->selectedOption] == "o")
+                    code = SDL_SCANCODE_O;
+                else if (block->dropdownOptions[block->selectedOption] == "p")
+                    code = SDL_SCANCODE_P;
+                else if (block->dropdownOptions[block->selectedOption] == "q")
+                    code = SDL_SCANCODE_Q;
+                else if (block->dropdownOptions[block->selectedOption] == "r")
+                    code = SDL_SCANCODE_R;
+                else if (block->dropdownOptions[block->selectedOption] == "s")
+                    code = SDL_SCANCODE_S;
+                else if (block->dropdownOptions[block->selectedOption] == "t")
+                    code = SDL_SCANCODE_T;
+                else if (block->dropdownOptions[block->selectedOption] == "u")
+                    code = SDL_SCANCODE_U;
+                else if (block->dropdownOptions[block->selectedOption] == "v")
+                    code = SDL_SCANCODE_V;
+                else if (block->dropdownOptions[block->selectedOption] == "w")
+                    code = SDL_SCANCODE_W;
+                else if (block->dropdownOptions[block->selectedOption] == "x")
+                    code = SDL_SCANCODE_X;
+                else if (block->dropdownOptions[block->selectedOption] == "y")
+                    code = SDL_SCANCODE_Y;
+                else if (block->dropdownOptions[block->selectedOption] == "z")
+                    code = SDL_SCANCODE_Z;
+                else if (block->dropdownOptions[block->selectedOption] == "1")
+                    code = SDL_SCANCODE_1;
+                else if (block->dropdownOptions[block->selectedOption] == "2")
+                    code = SDL_SCANCODE_2;
+                else if (block->dropdownOptions[block->selectedOption] == "3")
+                    code = SDL_SCANCODE_3;
+                else if (block->dropdownOptions[block->selectedOption] == "4")
+                    code = SDL_SCANCODE_4;
+                else if (block->dropdownOptions[block->selectedOption] == "5")
+                    code = SDL_SCANCODE_5;
+                else if (block->dropdownOptions[block->selectedOption] == "6")
+                    code = SDL_SCANCODE_6;
+                else if (block->dropdownOptions[block->selectedOption] == "7")
+                    code = SDL_SCANCODE_7;
+                else if (block->dropdownOptions[block->selectedOption] == "8")
+                    code = SDL_SCANCODE_8;
+                else if (block->dropdownOptions[block->selectedOption] == "9")
+                    code = SDL_SCANCODE_9;
+                else if (block->dropdownOptions[block->selectedOption] == "0")
+                    code = SDL_SCANCODE_0;
+
+                bool pressed = keyPressed(code);
+                cout << pressed << endl;
+            }
+                break;
+            case BLOCK_MOUSE_DOWN:
+                cout<<mouseDown()<<endl;
+                break;
+            case BLOCK_TIMER:
+                cout<<timerValue()<<endl;
+                break;
+            case BLOCK_RESET_TIMER:
+                resetTimer();
+                break;
+            case BLOCK_TOUCHING_COLOR: {
+                SDL_Color testColor = {0,255,0,255}; //testing
+                bool result = touchingColor(sprite, testColor);
+                cout <<"Touching Color: "<< result << endl;
+            }
+                break;
+            case BLOCK_COLOR_TOUCHING_COLOR: {
+                SDL_Color c1 = {0,0,255,255};
+                SDL_Color c2 = {255,0,0,255};
+
+                if (!stage.sprites.empty()) {
+                    bool result = colorTouchingColor(sprite, c1, *stage.sprites[0], c2);
+                    cout <<"Color Touching Color: "<< result << endl;
+                }
+            }
+                break;
+            case BLOCK_ANSWER:
+                cout<<"Answer: "<<getAnswer()<<endl;
+                break;
+            case BLOCK_MOUSE_X:
+                cout<<"Mouse X: "<< mouseX() << endl;
+                break;
+            case BLOCK_MOUSE_Y:
+                cout<<"Mouse Y: "<< mouseY() << endl;
+                break;
+            case BLOCK_SET_DRAG_MODE: {
+                string mode = block->dropdownOptions[block->selectedOption];
+
+                if (mode == "draggable")
+                    sprite.dragging = true;
+                else
+                    sprite.dragging = false;
+
+                cout<<"Drag mode set to: "<< mode << endl;
+            }
+                break;
+
         }
         sprite.rect.x = (int)sprite.x;
         sprite.rect.y = (int)sprite.y;
@@ -214,6 +412,8 @@ int main(int argc, char* argv[]) {
     stage.sprites.push_back(&cat);
     CodeTab.active = true;
 
+    initTimer();
+
     // Drawing the logo (top, right, corner)
     SDL_Texture* logoTex = loadTexture(m_renderer, "logo.png");
 
@@ -225,6 +425,8 @@ int main(int argc, char* argv[]) {
     initLooks(m_renderer);
     // Motion
     initMotion(m_renderer);
+    // Sensing
+    initSensing(m_renderer);
 
     srand(time(NULL));
     while(running) {
@@ -234,6 +436,50 @@ int main(int argc, char* argv[]) {
                 running = false;
             // Drag Sprite
             handleSpriteEvent(cat, e);
+            handleTextInput(e);
+
+            if (e.type == SDL_TEXTINPUT) {
+                for (auto& wb : workspaceBlocks) {
+                    if (wb.editingInput1)
+                        wb.inputText1 += e.text.text;
+                    if (wb.editingInput2)
+                        wb.inputText2 += e.text.text;
+                }
+            }
+
+             if (e.type == SDL_KEYDOWN) {
+                 if (e.key.keysym.sym == SDLK_BACKSPACE) {
+                     for (auto& wb : workspaceBlocks) {
+                         if (wb.editingInput1 && !wb.inputText1.empty())
+                             wb.inputText1.pop_back();
+
+                         if (wb.editingInput2 && !wb.inputText2.empty())
+                             wb.inputText2.pop_back();
+                     }
+                 }
+
+                 if (e.key.keysym.sym == SDLK_RETURN) {
+                     for (auto& wb : workspaceBlocks) {
+
+
+                         if (wb.editingInput1) {
+                             // if the block has text
+                             if (wb.hasTextInput)
+                                 wb.inputMessage = wb.inputText1;
+                             else
+                                 wb.inputValue = atof(wb.inputText1.c_str());
+
+                             wb.editingInput1 = false;
+                         }
+
+                         if (wb.editingInput2) {
+                             wb.inputValue2 = atof(wb.inputText2.c_str());
+                             wb.editingInput2 = false;
+                         }
+                     }
+                     SDL_StopTextInput();
+                 }
+             }
 
             // Clicking on tabs
             if(e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
@@ -314,14 +560,14 @@ int main(int argc, char* argv[]) {
             // Motion = CodeMenu
             else if(CodeTab.active && motionBtn.active)
                 handleMotionBlock(e,CodeTab.active,motionBtn.active);
+            else if (CodeTab.active && sensingBtn.active)
+                handleSensingBlock(e, CodeTab.active, sensingBtn.active);
         }
 
         // =========================== EXECUTION ENGINE ====================
-        if (true) {
-            for (auto& b : workspaceBlocks) {
-                if (b.isHat)
-                    executeBlockChain(b.id, cat, stage);
-            }
+        for (auto& b : workspaceBlocks) {
+            if (b.isHat)
+                executeBlockChain(b.id, cat, stage);
         }
         // =================================================================
         // Render codes
@@ -329,6 +575,8 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(m_renderer);
 
         renderStage(m_renderer, stage);
+        update_message(cat);
+        render_message(cat, m_renderer, font);
 
         drawTitleBar(m_renderer, m_window);
 
@@ -359,6 +607,37 @@ int main(int argc, char* argv[]) {
             renderSoundBlocks(m_renderer, font, CodeTab.active, soundBtn.active);
             renderLooksBlocks(m_renderer, font, CodeTab.active, looksBtn.active);
             renderMotionBlocks(m_renderer, font, CodeTab.active, motionBtn.active);
+            renderSensingBlocks(m_renderer, font, CodeTab.active, sensingBtn.active);
+
+        }
+        // ============= RENDER WORKSPACE BLOCKS ================
+        for (auto& b : workspaceBlocks) {
+            SDL_RenderCopy(m_renderer, b.texture, NULL, &b.rect);
+
+            // Draw reporter output if exists
+            if (!b.reporterOutput.empty()) {
+                SDL_Color color = {20,20,20,255};
+
+                SDL_Surface* surf = TTF_RenderUTF8_Blended(
+                    font,
+                    b.reporterOutput.c_str(),
+                    color
+                );
+
+                if (surf) {
+                    SDL_Texture* text = SDL_CreateTextureFromSurface(m_renderer, surf);
+                    SDL_Rect outRect;
+                    outRect.w = surf->w;
+                    outRect.h = surf->h;
+                    outRect.x = b.rect.x + 10;
+                    outRect.y = b.rect.y + b.rect.h + 4;
+
+                    SDL_RenderCopy(m_renderer, text, NULL, &outRect);
+
+                    SDL_FreeSurface(surf);
+                    SDL_DestroyTexture(text);
+                }
+            }
         }
 
         // Drawing character

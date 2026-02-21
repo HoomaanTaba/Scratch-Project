@@ -5,10 +5,10 @@
 #ifndef SCRATCH_SOUNDTAB_H
 #define SCRATCH_SOUNDTAB_H
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL2_gfx.h"
-#include "SDL2/SDL_image.h"
-#include "SDL2/SDL_ttf.h"
+#include <SDL2/SDL.h>
+#include "SDLInclude.h"
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include <string>
 #include <cstdlib>

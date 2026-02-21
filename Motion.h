@@ -243,6 +243,21 @@ void handleMotionBlock(SDL_Event& e, bool codeTabActive, bool motionBtnActive) {
     int mx, my;
     SDL_GetMouseState(&mx, &my);
     if(e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+        for (auto& wb : workspaceBlocks) {
+            if (wb.hasNumberInput && isInside(mx, my, wb.inputRect1)) {
+                wb.editingInput1 = true;
+                wb.editingInput2 = false;
+                SDL_StartTextInput();
+                return;
+            }
+
+            if (wb.hasSecondNumberInput && isInside(mx, my, wb.inputRect2)) {
+                wb.editingInput1 = false;
+                wb.editingInput2 = true;
+                SDL_StartTextInput();
+                return;
+            }
+        }
         bool caught = false;
         for(int i = workspaceBlocks.size()-1; i >= 0; i--) {
             if(isInside(mx, my, workspaceBlocks[i].rect)) {
@@ -369,6 +384,47 @@ void renderMotionBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActi
     }
     for(auto& wb : workspaceBlocks) {
         SDL_RenderCopy(renderer, wb.texture, NULL, &wb.rect);
+        //First Number Input
+        if (wb.hasNumberInput) {
+            wb.inputRect1 = {
+                wb.rect.x + wb.rect.w - 60,
+                wb.rect.y + 12,
+                50,
+                20
+            };
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &wb.inputRect1);
+
+            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 150);
+            SDL_RenderDrawRect(renderer, &wb.inputRect1);
+
+            SDL_Color textColor = {0, 0, 0, 255};
+            drawTextCentered(renderer, font, wb.inputText1.empty() ? to_string((int)wb.inputValue) : wb.inputText1,
+                wb.inputRect1,
+                textColor);
+        }
+
+        // Second Number Input
+        if (wb.hasSecondNumberInput) {
+            wb.inputRect2 = {
+                wb.rect.x + wb.rect.w - 120,
+                wb.rect.y + 12,
+                50,
+                20
+            };
+
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &wb.inputRect2);
+
+            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 150);
+            SDL_RenderDrawRect(renderer, &wb.inputRect2);
+
+            SDL_Color textColor = {0, 0, 0, 255};
+            drawTextCentered(renderer, font, wb.inputText2.empty() ? to_string((int)wb.inputValue2) : wb.inputText2,
+                wb.inputRect2,
+                textColor);
+        }
+
         if(wb.hasDropdown) {
             wb.dropdownRect.x = wb.rect.x + wb.rect.w - 100;
             wb.dropdownRect.y = wb.rect.y + 18;

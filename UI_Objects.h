@@ -62,6 +62,8 @@ struct Sprite {
             nullptr,
             SDL_FLIP_NONE);
     }
+
+    SDL_Surface* surface;
 };
 
 struct Stage {
@@ -74,7 +76,9 @@ struct Stage {
 
 SDL_Texture* loadTexture(SDL_Renderer* renderer, const string& path) {
     SDL_Surface* surf = IMG_Load(path.c_str());
-    if (!surf) return nullptr;
+    if (!surf)
+        return nullptr;
+
     SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
     SDL_FreeSurface(surf);
     return tex;
@@ -264,7 +268,20 @@ struct DraggableBlock {
 
     double inputValue2;
     bool hasSecondNumberInput = false;
+
+    bool hasTextInput = false;
     string inputMessage;
+
+    bool editingInput1 = false;
+    bool editingInput2 = false;
+
+    string inputText1;
+    string inputText2;
+
+    SDL_Rect inputRect1;
+    SDL_Rect inputRect2;
+
+    string reporterOutput;
 };
 
 
