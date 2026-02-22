@@ -1,5 +1,9 @@
-#ifndef INC_14041016_VARIABLES_H
-#define INC_14041016_VARIABLES_H
+//
+// Created by Fazel on 2/15/2026.
+//
+
+#ifndef SCRATCH_VARIABLES_H
+#define SCRATCH_VARIABLES_H
 
 #include "UI_Objects.h"
 SideButton variablesBtn = {
@@ -9,4 +13,4 @@ SideButton variablesBtn = {
         {0,545,70,65},
         true
 };
-#endif //INC_14041016_VARIABLES_H
+#endif //SCRATCH_VARIABLES_H

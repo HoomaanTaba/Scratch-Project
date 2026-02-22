@@ -2,131 +2,137 @@
 // Created by Fazel on 2/15/2026.
 //
 
-#ifndef SCRATCH_SOUND_H
-#define SCRATCH_SOUND_H
+#ifndef SCRATCH_EVENT_H
+#define SCRATCH_EVENT_H
+
 
 #include "UI_Objects.h"
-static int globalSoundBlockID = 2000;
-SideButton soundBtn = {
+static int globalEventBlockID = 1000;
+SideButton eventsBtn = {
     1,
-    "Sound",
-    {214,92,214,255},
-    {0,220,70,65},
+    "Events",
+    {255,213,64,255},
+    {0,285,70,65},
     true
 };
+void initEvents(SDL_Renderer* renderer) {
+    // Hat Blocks
+    SDL_Texture* greenFlagTex = IMG_LoadTexture(renderer, "greenFlag.png");
+    SDL_Texture* keyPressTex  = IMG_LoadTexture(renderer, "keyPressed.png");
+    SDL_Texture* spriteClickTex  = IMG_LoadTexture(renderer, "spriteClick.png");
+    SDL_Texture* backdropTex  = IMG_LoadTexture(renderer, "backDrop.png");
+    SDL_Texture* loudnessTex  = IMG_LoadTexture(renderer, "loudness.png");
+    SDL_Texture* receiveTex  = IMG_LoadTexture(renderer, "receive.png");
 
-void initSound(SDL_Renderer* renderer) {
-    // png blocks
-    SDL_Texture* playTex        = IMG_LoadTexture(renderer, "playSound.png");
-    SDL_Texture* playUntilTex   = IMG_LoadTexture(renderer, "playUntilDone.png");
-    SDL_Texture* stopAllTex     = IMG_LoadTexture(renderer, "stopAllSounds.png");
-    SDL_Texture* changePitchTex = IMG_LoadTexture(renderer, "changePitch.png");
-    SDL_Texture* setPitchTex    = IMG_LoadTexture(renderer, "setPitch.png");
-    SDL_Texture* changePanTex   = IMG_LoadTexture(renderer, "changePan.png");
-    SDL_Texture* setPanTex      = IMG_LoadTexture(renderer, "setPan.png");
-    SDL_Texture* clearEffectsTex = IMG_LoadTexture(renderer, "clearEffects.png");
-
+    // Command Blocks
+    SDL_Texture* broadcastTex  = IMG_LoadTexture(renderer, "broadcast.png");
+    SDL_Texture* broadcastWaitTex  = IMG_LoadTexture(renderer, "broadcastWait.png");
 
     int startY = 100, gap = 55;
 
-    // play sound
-    DraggableBlock playBlock = {
-            playTex,
-            {80, startY, 180, 40},
+    // when green flag
+    EventMenuBlocks.push_back({
+          greenFlagTex,
+             {80, startY, 140, 50},
+             false, 0, 0,
+             true,
+             -1,
+             globalEventBlockID++
+    });
+
+    // when key press
+    DraggableBlock keyBlock = {
+            keyPressTex,
+            {80, startY+gap, 150, 50},
+            false, 0, 0,
+            true,
+            -1,
+            globalEventBlockID++
+    };
+    keyBlock.hasDropdown = true;
+    keyBlock.dropdownOptions = {"space", "up arrow", "down arow", "a", "b", "c"};
+    keyBlock.dropdownRect = {0,0,80,20};
+    EventMenuBlocks.push_back(keyBlock);
+
+    // when sprite clicked
+    EventMenuBlocks.push_back({
+             spriteClickTex,
+             {80, startY+gap*2, 145, 50},
+             false, 0, 0,
+             true,
+             -1,
+             globalEventBlockID++
+    });
+
+    // when backdrop switches (dropdown)
+    DraggableBlock backdropBlock = {
+            backdropTex,
+            {80, startY+gap*3, 165, 50},
+            false, 0, 0,
+            true,
+            -1,
+            globalEventBlockID++
+    };
+    backdropBlock.hasDropdown = true;
+    backdropBlock.dropdownOptions = {"backdrop1", "backdrop2"};
+    backdropBlock.dropdownRect = {0,0,80,20};
+    EventMenuBlocks.push_back(backdropBlock);
+
+    // when loudness
+    EventMenuBlocks.push_back({
+             loudnessTex,
+             {80, startY+gap*4, 145, 50},
+             false, 0, 0,
+             true,
+             -1,
+             globalEventBlockID++
+    });
+
+    // when I receive
+    DraggableBlock receiveBlock = {
+            receiveTex,
+            {80, startY+gap*5, 155, 50},
+            false, 0, 0,
+            true,
+            -1,
+            globalEventBlockID++
+    };
+    receiveBlock.hasDropdown = true;
+    receiveBlock.dropdownOptions = {"message1", "message2", "message3"};
+    receiveBlock.dropdownRect = {0,0,90,20};
+    EventMenuBlocks.push_back(receiveBlock);
+
+    // broadcast
+    DraggableBlock broadcastBlock = {
+            broadcastTex,
+            {80, startY+gap*6, 140, 40},
             false, 0, 0,
             false,
             -1,
-            globalSoundBlockID++
+            globalEventBlockID++
     };
-    playBlock.hasDropdown = true;
-    playBlock.dropdownOptions = {"meow", "pop", "beep"};
-    playBlock.dropdownRect = {0,0,100,22};
-    SoundMenuBlocks.push_back(playBlock);
+    broadcastBlock.hasDropdown = true;
+    broadcastBlock.dropdownOptions = {"message1", "message2", "message3"};
+    broadcastBlock.dropdownRect = {0,0,90,20};
+    EventMenuBlocks.push_back(broadcastBlock);
 
-
-    // play sound until done block
-    DraggableBlock playUntilBlock = {
-            playUntilTex,
-            {80, startY+gap, 170, 40},
+    // broadcast and wait
+    DraggableBlock broadcastWaitBlock = {
+            broadcastWaitTex,
+            {80, startY+gap*7, 160, 40},
             false, 0, 0,
             false,
             -1,
-            globalSoundBlockID++
+            globalEventBlockID++
     };
-    playUntilBlock.hasDropdown = true;
-    playUntilBlock.dropdownOptions = {"meow", "pop", "beep"};
-    playUntilBlock.dropdownRect = {0,0,100,22};
-
-    SoundMenuBlocks.push_back(playUntilBlock);
-
-
-    // stop all sounds
-    SoundMenuBlocks.push_back({
-        stopAllTex,
-        {80, startY+gap*2, 140, 40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
-
-
-    // change pitch
-    SoundMenuBlocks.push_back({
-        changePitchTex,
-        {80, startY+gap*3, 180,40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
-
-
-    // set pitch
-    SoundMenuBlocks.push_back({
-        setPitchTex,
-        {80, startY+gap*4, 170, 40},
-        false, 0, 0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
-
-
-    // change pan
-    SoundMenuBlocks.push_back({
-        changePanTex,
-        {80, startY+gap*5, 160, 40},
-        false, 0, 0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
-
-
-    //set pan
-    SoundMenuBlocks.push_back({
-        setPanTex,
-        {80,startY+gap*6,155,40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
-
-    // clear Effects
-    SoundMenuBlocks.push_back({
-        clearEffectsTex,
-        {80, startY+gap*7, 110, 40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
+    broadcastWaitBlock.hasDropdown = true;
+    broadcastWaitBlock.dropdownOptions = {"message1", "message2", "message3"};
+    broadcastWaitBlock.dropdownRect = {0,0,90,20};
+    EventMenuBlocks.push_back(broadcastWaitBlock);
 }
 
-void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
-    if(!codeTabActive || !soundBtnActive)
+void handleEventBlock(SDL_Event& e, bool codeTabActive, bool eventBtnActive) {
+    if(!codeTabActive || !eventBtnActive)
         return;
     int mx, my;
     SDL_GetMouseState(&mx, &my);
@@ -147,8 +153,8 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
             }
         }
 
-        if(!caught && codeTabActive && soundBtnActive) {
-            for(auto& mb:SoundMenuBlocks) {
+        if(!caught && codeTabActive && eventBtnActive) {
+            for(auto& mb:EventMenuBlocks) {
                 if(isInside(mx, my, mb.rect)) {
                     DraggableBlock newNode = mb;
 
@@ -247,11 +253,11 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
     }
 }
 
-void renderSoundBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActive, bool soundBtnActive) {
-    if(!codeTabActive || !soundBtnActive)
+void renderEventBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActive, bool eventBtnActive) {
+    if(!codeTabActive || !eventBtnActive)
         return;
-    if(codeTabActive && soundBtnActive) {
-        for(auto& mb : SoundMenuBlocks) {
+    if(codeTabActive && eventBtnActive) {
+        for(auto& mb : EventMenuBlocks) {
             SDL_RenderCopy(renderer, mb.texture, NULL, &mb.rect);
         }
     }
@@ -295,6 +301,4 @@ void renderSoundBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActiv
         }
     }
 }
-
-
-#endif //SCRATCH_SOUND_H
+#endif //SCRATCH_EVENT_H

@@ -1,0 +1,6 @@
+
+#ifndef SCRATCH_SDLINCLUDE_H
+#define SCRATCH_SDLINCLUDE_H
+#include "SDL2/SDL2_gfx.h"
+#endif //SCRATCH_SDLINCLUDE_H
+

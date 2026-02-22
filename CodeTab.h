@@ -1,8 +1,8 @@
-#ifndef INC_14041016_CODETAB_H
-#define INC_14041016_CODETAB_H
+//
+// Created by Fazel on 2/15/2026.
+//
 
+#ifndef SCRATCH_CODETAB_H
+#define SCRATCH_CODETAB_H
 
-
-
-
-#endif //INC_14041016_CODETAB_H
+#endif //SCRATCH_CODETAB_H
