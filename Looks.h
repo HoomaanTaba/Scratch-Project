@@ -36,33 +36,33 @@ void initLooks(SDL_Renderer* renderer) {
 
     // sayHello for --- seconds
     LooksMenuBlocks.push_back({
-        sayHelloForTex,
-        {80, startY+11, 190, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      sayHelloForTex,
+                                      {80, startY+11, 190, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // sayHello
     LooksMenuBlocks.push_back({
-        sayHelloTex,
-        {80, startY+gap+22, 80, 40},
-        false, 0,0,
-        false,
-        -1,
-        globalLooksBlock
-    });
+                                      sayHelloTex,
+                                      {80, startY+gap+22, 80, 40},
+                                      false, 0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock
+                              });
 
     //think
     LooksMenuBlocks.push_back({
-        thinkTex,
-        {80, startY+gap*3, 90, 45},
-        false, 0, 0,
-        false,
-        -1,
-        globalLooksBlock
-    });
+                                      thinkTex,
+                                      {80, startY+gap*3, 90, 45},
+                                      false, 0, 0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock
+                              });
 
     // switch costume block
     DraggableBlock switchCostumeBlock = {
@@ -81,13 +81,13 @@ void initLooks(SDL_Renderer* renderer) {
 
     // next costume
     LooksMenuBlocks.push_back({
-        nextCostumeTex,
-        {80, startY+gap*5, 100, 45},
-        false, 0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      nextCostumeTex,
+                                      {80, startY+gap*5, 100, 45},
+                                      false, 0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     DraggableBlock switchBackdropBlock = {
             switchBackdropTex,
@@ -104,103 +104,103 @@ void initLooks(SDL_Renderer* renderer) {
 
     // next backdrop
     LooksMenuBlocks.push_back({
-        nextBackdropTex,
-        {80, startY+gap*7, 100, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      nextBackdropTex,
+                                      {80, startY+gap*7, 100, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // change size by
     LooksMenuBlocks.push_back({
-        changeSizeTex,
-        {80,startY+gap*8, 170, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      changeSizeTex,
+                                      {80,startY+gap*8, 170, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // set size to
     LooksMenuBlocks.push_back({
-        setSizeTex,
-        {80,startY+gap*9, 160, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      setSizeTex,
+                                      {80,startY+gap*9, 160, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // change color effect
     LooksMenuBlocks.push_back({
-        changeColorTex,
-        {80,startY+gap*10,200,45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      changeColorTex,
+                                      {80,startY+gap*10,200,45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // set color effect
     LooksMenuBlocks.push_back({
-        setColorTex,
-        {80, startY+gap*11, 190, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      setColorTex,
+                                      {80, startY+gap*11, 190, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // clear graphic effects
     LooksMenuBlocks.push_back({
-        clearGraphicTex,
-        {80, startY+gap*12, 190, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      clearGraphicTex,
+                                      {80, startY+gap*12, 190, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // show
     LooksMenuBlocks.push_back({
-        showTex,
-        {80, startY+gap*13-22, 50, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      showTex,
+                                      {80, startY+gap*13-22, 50, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // hide
     LooksMenuBlocks.push_back({
-        hideTex,
-        {80, startY+gap*14-22, 50, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      hideTex,
+                                      {80, startY+gap*14-22, 50, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // go to front layer
     LooksMenuBlocks.push_back({
-        goToFrontTex,
-        {80, startY+gap*15-22, 180, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      goToFrontTex,
+                                      {80, startY+gap*15-22, 180, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 
     // go forward layers
     LooksMenuBlocks.push_back({
-        goForwardTex,
-        {80, startY+gap*16-22, 200, 45},
-        false,0,0,
-        false,
-        -1,
-        globalLooksBlock++
-    });
+                                      goForwardTex,
+                                      {80, startY+gap*16-22, 200, 45},
+                                      false,0,0,
+                                      false,
+                                      -1,
+                                      globalLooksBlock++
+                              });
 }
 
 void handleLooksBlock(SDL_Event& e, bool codeTabActive, bool looksBtnActive) {
@@ -212,6 +212,10 @@ void handleLooksBlock(SDL_Event& e, bool codeTabActive, bool looksBtnActive) {
         bool caught = false;
         for(int i = workspaceBlocks.size()-1; i >= 0; i--) {
             if(isInside(mx, my, workspaceBlocks[i].rect)) {
+
+                if(handleNumberInputClick(mx,my,i))
+                    return;
+
                 workspaceBlocks[i].dragging = true;
                 workspaceBlocks[i].parentID = -1;
                 workspaceBlocks[i].offsetX = mx - workspaceBlocks[i].rect.x;
