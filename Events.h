@@ -2,6 +2,11 @@
 #define INC_14041016_EVENTS_H
 
 #include "UI_Objects.h"
+
+
+// GRAPHIC PART
+
+
 static int globalEventBlockID = 1000;
 // SideButton of events in code menu
 SideButton eventsBtn = {
@@ -76,14 +81,23 @@ void initEvents(SDL_Renderer* renderer) {
     EventMenuBlocks.push_back(backdropBlock);
 
     // when loudness
-    EventMenuBlocks.push_back({
-             loudnessTex,
-             {80, startY+gap*4, 145, 50},
-             false, 0, 0,
-             true,
-             -1,
-             globalEventBlockID++
-    });
+    DraggableBlock loudnessBlock = {
+            loudnessTex,
+            {80, startY+gap*4, 155,50},
+            false,0,0,
+            true,
+            -1,
+            globalEventBlockID++
+    };
+    loudnessBlock.hasDropdown = true;
+    loudnessBlock.dropdownOptions = {"message1", "message2", "message3"};
+    loudnessBlock.dropdownRect = {0,0,60,20};
+
+    loudnessBlock.hasNumberInput = true;
+    loudnessBlock.inputStr = "10";
+    // white circle geo
+    loudnessBlock.inputRect = {120, 15,30,20};
+    EventMenuBlocks.push_back(loudnessBlock);
 
     // when I receive
     DraggableBlock receiveBlock = {
@@ -137,8 +151,18 @@ void handleEventBlock(SDL_Event& e, bool codeTabActive, bool eventBtnActive) {
         bool caught = false;
         for(int i = workspaceBlocks.size()-1; i >= 0; i--) {
             if(isInside(mx, my, workspaceBlocks[i].rect)) {
-                workspaceBlocks[i].dragging = true;
-                workspaceBlocks[i].parentID = -1;
+                if(handleNumberInputClick(mx,my,i))
+                    return;
+                // typical dragging
+                int oldParent = workspaceBlocks[i].parentID;
+                if(oldParent != -1) {
+                    for(auto& b : workspaceBlocks) {
+                        if(b.id == oldParent) {
+                            b.nextID = -1;
+                            break;
+                        }
+                    }
+                }
                 workspaceBlocks[i].offsetX = mx - workspaceBlocks[i].rect.x;
                 workspaceBlocks[i].offsetY = my - workspaceBlocks[i].rect.y;
 
@@ -146,6 +170,12 @@ void handleEventBlock(SDL_Event& e, bool codeTabActive, bool eventBtnActive) {
                 workspaceBlocks.erase(workspaceBlocks.begin() + i);
                 workspaceBlocks.push_back(temp);
                 caught = true;
+
+                // cancel typing by clicking outside textbox
+                for(auto& b: workspaceBlocks)
+                    if(&b != &workspaceBlocks.back())
+                        b.isTyping = false;
+
                 break;
             }
         }
@@ -154,7 +184,7 @@ void handleEventBlock(SDL_Event& e, bool codeTabActive, bool eventBtnActive) {
             for(auto& mb:EventMenuBlocks) {
                 if(isInside(mx, my, mb.rect)) {
                     DraggableBlock newNode = mb;
-
+                    newNode.id = globalSoundBlockID++;
                     newNode.parentID = -1;
                     newNode.dragging = true;
 
@@ -179,12 +209,12 @@ void handleEventBlock(SDL_Event& e, bool codeTabActive, bool eventBtnActive) {
                         if(&workspaceBlocks[k]==&b) {
                             workspaceBlocks.erase(workspaceBlocks.begin() + k);
                             break;
-                            return;
                         }
                     }
+                    return;
                 }
-                // Sticking part
 
+                // Sticking part
                 for(auto& target : workspaceBlocks) {
                     if(&b == &target)
                         continue;
@@ -201,6 +231,7 @@ void handleEventBlock(SDL_Event& e, bool codeTabActive, bool eventBtnActive) {
                         b.rect.x = target.rect.x;
                         b.rect.y = target.rect.y + target.rect.h-6; //Overlapping pixels
                         b.parentID = target.id;
+                        target.nextID = b.id;
                         break; // when fined good block, break;
                     }
                 }
@@ -272,6 +303,23 @@ void renderEventBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActiv
     }
     for(auto& wb : workspaceBlocks) {
         SDL_RenderCopy(renderer, wb.texture, NULL, &wb.rect);
+
+
+        if(wb.hasNumberInput) {
+            SDL_Rect absInput {
+                wb.rect.x + wb.inputRect.x,
+                wb.rect.y + wb.inputRect.y,
+                wb.inputRect.w,
+                wb.inputRect.h
+            };
+            SDL_Color textColor = {0,0,0};
+            if(wb.isTyping)
+                textColor = {0,0,255};
+
+            drawTextCentered(renderer, font, wb.inputStr, absInput, textColor);
+        }
+
+
         if(wb.hasDropdown) {
             wb.dropdownRect.x = wb.rect.x + wb.rect.w - 100;
             wb.dropdownRect.y = wb.rect.y + 18;
@@ -310,5 +358,4 @@ void renderEventBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActiv
         }
     }
 }
-
 #endif //INC_14041016_EVENTS_H
