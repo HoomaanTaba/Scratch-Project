@@ -1,6 +1,8 @@
 #ifndef INC_14041016_SOUND_H
 #define INC_14041016_SOUND_H
 
+// GRAPHIC PART
+
 #include "UI_Objects.h"
 static int globalSoundBlockID = 2000;
 
@@ -36,8 +38,9 @@ void initSound(SDL_Renderer* renderer) {
             globalSoundBlockID++
     };
     playBlock.hasDropdown = true;
+    playBlock.blockType = "play_sound";
     playBlock.dropdownOptions = {"meow", "pop", "beep"};
-    playBlock.dropdownRect = {0,0,100,22};
+    playBlock.dropdownLocalRect = {70,8,50,22};
     SoundMenuBlocks.push_back(playBlock);
 
 
@@ -51,75 +54,102 @@ void initSound(SDL_Renderer* renderer) {
             globalSoundBlockID++
     };
     playUntilBlock.hasDropdown = true;
+    playUntilBlock.blockType = "play_until_done";
     playUntilBlock.dropdownOptions = {"meow", "pop", "beep"};
-    playUntilBlock.dropdownRect = {0,0,100,22};
+    playUntilBlock.dropdownLocalRect = {80,8,50,22};
 
     SoundMenuBlocks.push_back(playUntilBlock);
 
 
     // stop all sounds
-    SoundMenuBlocks.push_back({
-        stopAllTex,
-        {80, startY+gap*2, 100, 40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
+    DraggableBlock stopBlock = {
+            stopAllTex,
+            {80,startY+gap*2, 100,40},
+            false,0,0,
+            false,
+            -1,
+            globalSoundBlockID++
+    };
+    stopBlock.blockType = "stop_all";
+    SoundMenuBlocks.push_back(stopBlock);
 
 
     // change pitch
-    SoundMenuBlocks.push_back({
-        changePitchTex,
-        {80, startY+gap*3, 180,40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
+    DraggableBlock changePitchBlock = {
+            changePitchTex,
+            {80, startY+gap*3,180,40},
+            false,0,0,
+            false,
+            -1,
+            globalSoundBlockID++
+    };
+    changePitchBlock.blockType = "change_pitch";
+    changePitchBlock.hasNumberInput = true;
+    changePitchBlock.inputRect = {143,7,35,20};
+    changePitchBlock.hasDropdown = true;
+    changePitchBlock.dropdownOptions = {"pitch", "pan"};
+    changePitchBlock.dropdownLocalRect = {48,7,50,22};
+    SoundMenuBlocks.push_back(changePitchBlock);
 
 
     // set pitch
-    SoundMenuBlocks.push_back({
-        setPitchTex,
-        {80, startY+gap*4, 170, 40},
-        false, 0, 0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
+    DraggableBlock setPitchBlock = {
+            setPitchTex,
+            {80,startY+gap*4,170,40},
+            false,0,0,
+            false,
+            -1,
+            globalSoundBlockID++
+    };
+    setPitchBlock.blockType = "set_pitch";
+    setPitchBlock.hasNumberInput = true;
+    setPitchBlock.inputRect = {130,8,35,20};
+    setPitchBlock.hasDropdown = true;
+    setPitchBlock.dropdownOptions = {"pitch", "pan"};
+    setPitchBlock.dropdownLocalRect = {38,7,50,22};
+    SoundMenuBlocks.push_back(setPitchBlock);
+
 
 
     // change pan
-    SoundMenuBlocks.push_back({
-        changePanTex,
-        {80, startY+gap*5, 160, 40},
-        false, 0, 0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
-
+    DraggableBlock changePanBlock = {
+            changePanTex,
+            {80,startY+gap*5,140,40},
+            false,0,0,
+            false,
+            -1,
+            globalSoundBlockID++
+    };
+    changePanBlock.blockType = "change_pan";
+    changePanBlock.hasNumberInput = true;
+    changePanBlock.inputRect = {100,8,35,20};
+    SoundMenuBlocks.push_back(changePanBlock);
 
     //set pan
-    SoundMenuBlocks.push_back({
-        setPanTex,
-        {80,startY+gap*6,155,40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
+    DraggableBlock setPanBlock = {
+            setPanTex,
+            {80, startY+gap*6, 125,40},
+            false,0,0,
+            false,
+            -1,
+            globalSoundBlockID++
+    };
+    setPanBlock.blockType = "set_pan";
+    setPanBlock.hasNumberInput = true;
+    setPanBlock.inputRect = {72,8,35,20};
+    SoundMenuBlocks.push_back(setPanBlock);
 
     // clear Effects
-    SoundMenuBlocks.push_back({
-        clearEffectsTex,
-        {80, startY+gap*7, 110, 40},
-        false,0,0,
-        false,
-        -1,
-        globalSoundBlockID++
-    });
+    DraggableBlock clearBlcok = {
+            clearEffectsTex,
+            {80, startY+gap*7,110,40},
+            false,0,0,
+            false,
+            -1,
+            globalSoundBlockID++
+    };
+    clearBlcok.blockType = "clear_effects";
+    SoundMenuBlocks.push_back(clearBlcok);
 }
 
 void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
@@ -131,15 +161,32 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
         bool caught = false;
         for(int i = workspaceBlocks.size()-1; i >= 0; i--) {
             if(isInside(mx, my, workspaceBlocks[i].rect)) {
-                workspaceBlocks[i].dragging = true;
-                workspaceBlocks[i].parentID = -1;
+                if(handleNumberInputClick(mx,my,i))
+                    return;
+
+                int oldParent = workspaceBlocks[i].parentID;
+                if(oldParent != -1) {
+                    for(auto& b : workspaceBlocks) {
+                        if(b.id == oldParent) {
+                            b.nextID = -1;
+                            break;
+                        }
+                    }
+                }
                 workspaceBlocks[i].offsetX = mx - workspaceBlocks[i].rect.x;
                 workspaceBlocks[i].offsetY = my - workspaceBlocks[i].rect.y;
 
                 DraggableBlock temp = workspaceBlocks[i];
+                temp.dragging = true;
+                temp.offsetX = mx - temp.rect.x;
+                temp.offsetY = my - temp.rect.y;
                 workspaceBlocks.erase(workspaceBlocks.begin() + i);
                 workspaceBlocks.push_back(temp);
                 caught = true;
+                return;
+                for(auto& b : workspaceBlocks)
+                    if(&b != &workspaceBlocks.back())
+                        b.isTyping = false;
                 break;
             }
         }
@@ -148,13 +195,15 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
             for(auto& mb:SoundMenuBlocks) {
                 if(isInside(mx, my, mb.rect)) {
                     DraggableBlock newNode = mb;
-
+                    newNode.blockType = mb.blockType;
+                    newNode.id = globalSoundBlockID++;
                     newNode.parentID = -1;
                     newNode.dragging = true;
 
                     newNode.rect.x = mx - mb.rect.w/2;
                     newNode.rect.y = my - mb.rect.h/2;
 
+                    newNode.dragging = true;
                     newNode.offsetX = mb.rect.w/2;
                     newNode.offsetY = mb.rect.h/2;
                     workspaceBlocks.push_back(newNode);
@@ -172,13 +221,11 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
                     for(int k = 0; k < workspaceBlocks.size(); k++) {
                         if(&workspaceBlocks[k]==&b) {
                             workspaceBlocks.erase(workspaceBlocks.begin() + k);
-                            break;
                             return;
                         }
                     }
                 }
                 // Sticking part
-
                 for(auto& target : workspaceBlocks) {
                     if(&b == &target)
                         continue;
@@ -195,6 +242,7 @@ void handleSoundBlock(SDL_Event& e, bool codeTabActive, bool soundBtnActive) {
                         b.rect.x = target.rect.x;
                         b.rect.y = target.rect.y + target.rect.h-6; //Overlapping pixels
                         b.parentID = target.id;
+                        target.nextID = b.id;
                         break; // when fined good block, break;
                     }
                 }
@@ -266,9 +314,24 @@ void renderSoundBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActiv
     }
     for(auto& wb : workspaceBlocks) {
         SDL_RenderCopy(renderer, wb.texture, NULL, &wb.rect);
+        if(wb.hasNumberInput) {
+            SDL_Rect absInput = {
+                    wb.rect.x + wb.inputRect.x,
+                    wb.rect.y + wb.inputRect.y,
+                    wb.inputRect.w,
+                    wb.inputRect.h
+            };
+
+            SDL_Color textColor = wb.isTyping ? SDL_Color {0,0,255,255} : SDL_Color {0,0,0,255};
+            drawTextCentered(renderer, font,wb.inputStr,absInput,textColor);
+        }
         if(wb.hasDropdown) {
-            wb.dropdownRect.x = wb.rect.x + wb.rect.w - 100;
-            wb.dropdownRect.y = wb.rect.y + 18;
+            wb.dropdownRect = {
+                    wb.rect.x + wb.dropdownLocalRect.x,
+                    wb.rect.y + wb.dropdownLocalRect.y,
+                    wb.dropdownLocalRect.w,
+                    wb.dropdownLocalRect.h
+            };
 
             SDL_SetRenderDrawColor(renderer, 255,255,255,255);
             SDL_RenderFillRect(renderer, &wb.dropdownRect);
@@ -304,5 +367,149 @@ void renderSoundBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActiv
         }
     }
 }
+
+
+// ENGINE PART
+
+map<string, Mix_Chunk*> soundCache;
+
+void loadSound(string name, string path) {
+    Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
+    if(chunk) {
+        soundCache[name] = chunk;
+    }
+    else {
+        cout << "Failed to load sound %s!" << name.c_str() << Mix_GetError();
+
+    }
+}
+
+void executeSoundBlock(DraggableBlock& b) {
+    string effectType = "";
+    if(b.hasDropdown && !b.dropdownOptions.empty())
+        effectType = b.dropdownOptions[b.selectedOption];
+
+    if(b.blockType == "play_sound") {
+        string sName = b.dropdownOptions[b.selectedOption];
+        if(soundCache.count(sName)) {
+            Mix_Chunk* chunk = soundCache[sName];
+            int ch = Mix_PlayChannel(-1,soundCache[sName], 0);
+            b.activeChannel = ch;
+            b.isRunning = true;
+        }
+        else {
+            cout << "Sound not found in cache: " << endl;
+        }
+    }
+
+    else if(b.blockType == "play_until_done") {
+        string sName = b.dropdownOptions[b.selectedOption];
+        if(soundCache.count(sName)) {
+            int ch = Mix_PlayChannel(-1,soundCache[sName],0);
+            b.activeChannel = ch;
+
+            if(ch < 0) {
+                cout << "Failed to play sound: " << Mix_GetError() << endl;
+                b.waitingForFinish = false;
+            }
+            else {
+                b.waitingForFinish = true;
+                b.isRunning = true;
+            }
+        }
+    }
+
+    else if(b.blockType == "stop_all") {
+        Mix_HaltChannel(-1);
+    }
+
+    else if(b.blockType == "change_pitch") {
+        try {
+            int v = stoi(b.inputStr);
+            b.currentPitch += v;
+            if(b.currentPitch > 50)
+                b.currentPitch = 50;
+            if(b.currentPitch < -50)
+                b.currentPitch = -50;
+
+            int newFreq = 44100 + (b.currentPitch * 200);
+            //Mix_CloseAudio();
+            //Mix_OpenAudio(newFreq, MIX_DEFAULT_FORMAT, 2, 2048);
+        }
+        catch(...) {
+            cout << "Error";
+        }
+    }
+
+    else if(b.blockType == "set_pitch") {
+        try {
+            int v = stoi(b.inputStr);
+            b.currentPitch = v;
+            if(b.currentPitch > 50)
+                b.currentPitch = 50;
+            if(b.currentPitch < -50)
+                b.currentPitch = -50;
+
+            int newFreq = 44100 + (b.currentPitch * 200);
+            //Mix_CloseAudio();
+            //Mix_OpenAudio(newFreq, MIX_DEFAULT_FORMAT, 2, 2048);
+        }
+        catch(...) {
+            cout << "Error";
+        }
+    }
+
+    else if(b.blockType == "change_pan") {
+        try {
+            int v = stoi(b.inputStr);
+            if(effectType == "pan") {
+                b.currentPan = v;
+                if(b.currentPan > 128)
+                    b.currentPan = 128;
+                if(b.currentPan < -128)
+                    b.currentPan = -128;
+
+                int left = 128 - b.currentPan;
+                int right = 128 + b.currentPan;
+
+                Mix_SetPanning(-1,left,right);
+            }
+            else if(effectType == "pitch") {
+                b.currentPitch = v;
+                if(b.currentPitch > 50)
+                    b.currentPitch = 50;
+                if(b.currentPitch < -50)
+                    b.currentPitch = -50;
+
+                int newFreq = 44100 + (b.currentPitch * 200);
+                Mix_CloseAudio();
+                Mix_OpenAudio(newFreq,MIX_DEFAULT_FORMAT,2,2048);
+            }
+        }
+        catch(...) {
+            cout << "Error";
+        }
+    }
+
+    else if(b.blockType == "set_pan") {
+        try {
+            int v = stoi(b.inputStr);
+            Mix_SetPanning(-1,128-v,128+v);
+        }
+        catch(...) {
+            cout << "Error" << endl;
+        }
+    }
+
+    else if(b.blockType == "clear_effects") {
+        b.currentPan = 0;
+        b.currentPitch = 0;
+        Mix_SetPanning(-1,128,128);
+
+        //Mix_CloseAudio();
+        //Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
+    }
+}
+
 
 #endif //INC_14041016_SOUND_H
