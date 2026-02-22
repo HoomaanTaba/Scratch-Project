@@ -191,6 +191,9 @@ void handleMotionBlock(SDL_Event& e, bool codeTabActive, bool motionBtnActive) {
         bool caught = false;
         for(int i = workspaceBlocks.size()-1; i >= 0; i--) {
             if(isInside(mx, my, workspaceBlocks[i].rect)) {
+                if(handleNumberInputClick(mx,my,i))
+                    return;
+
                 workspaceBlocks[i].dragging = true;
                 workspaceBlocks[i].parentID = -1;
                 workspaceBlocks[i].offsetX = mx - workspaceBlocks[i].rect.x;
@@ -233,7 +236,6 @@ void handleMotionBlock(SDL_Event& e, bool codeTabActive, bool motionBtnActive) {
                         if(&workspaceBlocks[k]==&b) {
                             workspaceBlocks.erase(workspaceBlocks.begin() + k);
                             break;
-                            return;
                         }
                     }
                 }
@@ -361,6 +363,18 @@ void renderMotionBlocks(SDL_Renderer* renderer, TTF_Font* font, bool codeTabActi
                                      textColor);
                 }
             }
+        }
+        // input number on blocks
+        if(wb.hasNumberInput) {
+            SDL_Rect absInput {
+                wb.rect.x + wb.inputRect.x,
+                wb.rect.y + wb.inputRect.y,
+                wb.inputRect.x,
+                wb.inputRect.h
+            };
+
+            SDL_Color textColor = wb.isTyping ? SDL_Color{0,0,255} : SDL_Color{0,0,0};
+            drawTextCentered(renderer, font, wb.inputStr, absInput, textColor);
         }
     }
 }
