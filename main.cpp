@@ -8,9 +8,11 @@
 #include "Sensing.h"
 #include "Operators.h"
 #include "Variables.h"
+#include "Engine.h"
 using namespace std;
 
 vector<DraggableBlock> workspaceBlocks;
+vector<RunningProgram> activePrograms;
 
 vector<DraggableBlock> EventMenuBlocks;
 vector<DraggableBlock> SoundMenuBlocks;
@@ -20,6 +22,7 @@ vector<DraggableBlock> ControlMenuBlocks;
 vector<DraggableBlock> SensingMenuBlocks;
 vector<DraggableBlock> OperatorMenuBlocks;
 vector<DraggableBlock> VariablesMenuBlocks;
+
 
 SDL_Rect workspaceArea = {70,50,550,700}; // code menu engine area
 SDL_Rect stageArea = {700,90,424,520}; // sprite area
@@ -74,8 +77,6 @@ int main(int argc, char* argv[]) {
 
     // Events - CodeMenu
     initEvents(m_renderer);
-    // Sound - CodeMenu
-    initSound(m_renderer);
     // Looks = CodeMenu
     initLooks(m_renderer);
     // Motion
@@ -88,12 +89,55 @@ int main(int argc, char* argv[]) {
     initVariables(m_renderer);
     // Sensing
     initSensing(m_renderer);
+    // Sound - CodeMenu
+    initSound(m_renderer);
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048)<0)
+        cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\\n" << Mix_GetError() << endl;
+    loadSound("meow","meow.wav");
+    loadSound("pop", "pop.wav");
+    loadSound("beep","beep.wav");
 
     while(running) {
         while(SDL_PollEvent(&e)) {
             // Events:
             if(e.type == SDL_QUIT)
                 running = false;
+
+            // numbers typing
+            if(e.type == SDL_TEXTINPUT) {
+                for(auto& b : workspaceBlocks) {
+                    // if blockTyping was true and less than 3 digits
+                    if(b.isTyping && b.inputStr.length() < 3) {
+                        // only numbers!
+                        if(isdigit(e.text.text[0])) {
+                            b.inputStr += e.text.text;
+                        }
+                    }
+                }
+            }
+
+            // manage control keys
+            if(e.type == SDL_KEYDOWN) {
+                if(e.key.keysym.sym == SDLK_SPACE) {
+                    for(auto& b : workspaceBlocks) {
+                        if(b.isHat) {
+                            startProgram(b.id);
+                        }
+                    }
+                }
+                for(auto& b : workspaceBlocks) {
+                    // if backspace clicked
+                    if(e.key.keysym.sym == SDLK_BACKSPACE && !b.inputStr.empty()) {
+                        b.inputStr.pop_back();
+                    }
+                    // is Enter clicked
+                    if(e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_KP_ENTER) {
+                        b.isTyping = false;
+                        SDL_StopTextInput();
+                    }
+                }
+            }
+
             // Drag Sprite
             handleSpriteEvent(cat, e);
 
@@ -163,34 +207,84 @@ int main(int argc, char* argv[]) {
                     // make other menus unactive
                     eventsBtn.active = looksBtn.active = soundBtn.active = controlBtn.active = sensingBtn.active = operatorsBtn.active = motionBtn.active = false;
                 }
+
+                // dropdown event
+                for(auto&b : workspaceBlocks) {
+                    if(!b.hasDropdown)
+                        continue;
+                    // click on dropdown box
+                    if(isInside(mx,my,b.dropdownRect)) {
+                        b.dropdownOpen = !b.dropdownOpen;
+                    }
+                    //click on options
+                    if(b.dropdownOpen) {
+                        for(int i = 0; i < b.dropdownOptions.size(); i++) {
+                            SDL_Rect optionRect = {
+                                    b.dropdownRect.x,
+                                    b.dropdownRect.y + (i+1)*b.dropdownRect.h,
+                                    b.dropdownRect.w,
+                                    b.dropdownRect.h
+                            };
+                            if(isInside(mx,my,optionRect)) {
+                                b.selectedOption = i;
+                                b.dropdownOpen = false;
+                            }
+                        }
+                    }
+                }
+                //******
+//                for(auto& b : workspaceBlocks) {
+//                    if(isInside(mx,my,b.rect)) {
+//                        // if clicked, play the sound
+//                        executeSoundBlock(b);
+//                    }
+//                }
+            }
+            if(e.type == SDL_KEYDOWN) {
+                if(e.key.keysym.sym == SDLK_BACKSPACE) {
+                    for(auto& b : workspaceBlocks) {
+                        if(b.isTyping && !b.inputStr.empty())
+                            b.inputStr.pop_back();
+                    }
+                }
+                if(e.key.keysym.sym == SDLK_RETURN) {
+                    for(auto& b : workspaceBlocks)
+                        b.isTyping = false;
+                    SDL_StopTextInput();
+                }
             }
             // Events - CodeMenu
             if(CodeTab.active && eventsBtn.active)
                 handleEventBlock(e, CodeTab.active, eventsBtn.active);
-            // Sound - CodeMenu
+                // Sound - CodeMenu
             else if(CodeTab.active && soundBtn.active)
                 handleSoundBlock(e, CodeTab.active, soundBtn.active);
-            // Looks - CodeMenu
+                // Looks - CodeMenu
             else if(CodeTab.active && looksBtn.active)
                 handleLooksBlock(e,CodeTab.active,looksBtn.active);
-            // Motion - CodeMenu
+                // Motion - CodeMenu
             else if(CodeTab.active && motionBtn.active)
                 handleMotionBlock(e,CodeTab.active,motionBtn.active);
-            // Control - CodeMenu
+                // Control - CodeMenu
             else if(CodeTab.active && controlBtn.active)
                 handleControlBlock(e,CodeTab.active,controlBtn.active);
-            // Operators
+                // Operators
             else if(CodeTab.active && operatorsBtn.active)
                 handleOperatorBlock(e,CodeTab.active,operatorsBtn.active);
-            // Variables
+                // Variables
             else if(CodeTab.active && variablesBtn.active)
                 handleVariablesBlock(e, CodeTab.active, variablesBtn.active);
-            // Sensing
+                // Sensing
             else if(CodeTab.active && sensingBtn.active)
                 handleSensingBlock(e,CodeTab.active,sensingBtn.active);
         }
         // Render codes
+
+        updatePrograms();
+
         SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
+
+
         SDL_RenderClear(m_renderer);
         drawTitleBar(m_renderer, m_window);
 
