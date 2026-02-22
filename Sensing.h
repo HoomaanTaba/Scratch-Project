@@ -270,6 +270,10 @@ void handleSensingBlock(SDL_Event& e, bool codeTabActive, bool sensingBtnActive)
         bool caught = false;
         for(int i = workspaceBlocks.size()-1; i >= 0; i--) {
             if(isInside(mx, my, workspaceBlocks[i].rect)) {
+
+                if(handleNumberInputClick(mx,my,i))
+                    return;
+
                 workspaceBlocks[i].dragging = true;
                 workspaceBlocks[i].parentID = -1;
                 workspaceBlocks[i].offsetX = mx - workspaceBlocks[i].rect.x;
