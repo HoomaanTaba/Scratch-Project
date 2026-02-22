@@ -259,14 +259,14 @@ void initLooks(SDL_Renderer* renderer) {
     DraggableBlock showBlock;
     showBlock.blockType = BLOCK_SHOW;
     showBlock.texture = showTex;
-    showBlock.rect = {80, startY+gap*14-22, 50, 45};
+    showBlock.rect = {80, startY+gap*14-22, 100, 45};
     showBlock.id = globalLooksBlock++;
     showBlock.isHat = false;
     LooksMenuBlocks.push_back(showBlock);
 
     // hide
     DraggableBlock hideBlock;
-    hideBlock.blockType = BLOCK_SHOW;
+    hideBlock.blockType = BLOCK_HIDE;
     hideBlock.texture = hideTex;
     hideBlock.rect = {80, startY+gap*15-22, 50, 45};
     hideBlock.id = globalLooksBlock++;
@@ -744,6 +744,8 @@ int get_costume_number(Sprite& s) {
 }
 
 string get_costume_name(Sprite& s) {
+    if (s.currentCostume < 0 || s.currentCostume >= s.effects.size())
+        return "noun";
     return s.costumeNames[s.currentCostume];
 }
 
