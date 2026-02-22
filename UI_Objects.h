@@ -7,7 +7,10 @@
 #include "SDL2/SDL2_gfx.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_ttf.h"
+#include "SDL2/SDL_mixer.h"
+#include "SDL2/SDL_audio.h"
 #include "string"
+#include "map"
 using namespace std;
 
 // Creating Scratch Character
@@ -199,13 +202,44 @@ struct DraggableBlock {
     bool isHat;
     int parentID = -1;
     int id;
+
     // DropDown Support
     bool hasDropdown = false;
     vector<string> dropdownOptions;
     int selectedOption = 0;
     bool dropdownOpen = false;
+
+    // input number
+    bool hasNumberInput = false;
+    string inputStr = "10";
+    bool isTyping = false;
+    SDL_Rect inputRect;
+
+
+    // local dropdown rect
+    SDL_Rect  dropdownLocalRect;
     SDL_Rect dropdownRect;
+
+
+    // block type
+    string blockType;
+
+    // for sound
+    string soundName;
+
+    // sound runtime state
+    bool isRunning = false;
+    bool waitingForFinish = false;
+    int activeChannel = -1;
+
+    // sound pitch and pan
+    int currentPan = 0;
+    int currentPitch = 0;
+
+    int nextID = -1;
+    bool iExecuted = false;
 };
+
 
 
 extern vector<DraggableBlock> workspaceBlocks;
@@ -218,6 +252,31 @@ extern vector<DraggableBlock> ControlMenuBlocks;
 extern vector<DraggableBlock> SensingMenuBlocks;
 extern vector<DraggableBlock> OperatorMenuBlocks;
 extern vector<DraggableBlock> VariablesMenuBlocks;
+
+
+
+
+
+bool handleNumberInputClick(int mx, int my, int index) {
+    if(!workspaceBlocks[index].hasNumberInput)
+        return false;
+
+    SDL_Rect absInputRect = {
+            workspaceBlocks[index].rect.x + workspaceBlocks[index].inputRect.x,
+            workspaceBlocks[index].rect.y + workspaceBlocks[index].inputRect.y,
+            workspaceBlocks[index].inputRect.w,
+            workspaceBlocks[index].inputRect.h
+    };
+
+    if(isInside(mx,my,absInputRect)) {
+        for(auto& b : workspaceBlocks)
+            b.isTyping = false;
+        workspaceBlocks[index].isTyping = true;
+        SDL_StartTextInput();
+        return true;
+    }
+    return false;
+}
 
 
 #endif //INC_14041016_UI_OBJECTS_H
