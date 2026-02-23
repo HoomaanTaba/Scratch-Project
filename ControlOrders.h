@@ -1,172 +1,164 @@
 
-#ifndef SCRATCH_CONTROLORDERS_H
-#define SCRATCH_CONTROLORDERS_H
 
-#endif //SCRATCH_CONTROLORDERS_H
-
-//the logic of control orders as in 4.5 in project doc
-#include <bits/stdc++.h>
+#ifndef SCRATCH_PROJECT_CONTROLORDERS_H
+#define SCRATCH_PROJECT_CONTROLORDERS_H
 #include <SDL2/SDL.h>
+#include <bits/stdc++.h>
 using namespace std;
-struct ExucationContext {
-    bool isRunning=true; //if true stops this scrip
-    bool stopAll=false; //if true stops the project
-    int watchdogCounter=0; //for the unlimited loops
-    SDL_Renderer* renderer=nullptr;
+struct ExecationContext {
+    bool isRunning = true;
+    bool stopAll = false;
+    int watchdogCounter = 0;
 };
-typedef void(*CommandFn)(ExucationContext&);
-typedef bool (*ConditionFn)(ExucationContext&);
-//defining of all the blocks that we need to make and beacuse the control orders mostly work with other orders (moving orders etc) we need to define command and conditions too for some of the orders
+
+typedef void(*CommandFn)(ExecationContext&);
+typedef bool(*ConditionFn)(ExecationContext&);
+
 enum Control_Block_Type {
-    //control blocks
-    BLOCK_WAIT,
-    BLOCK_REPEAT,
-    BLOCK_FOREVER,
-    BLOCK_IF,
-    BLOCK_IF_ELSE,
-    BLOCK_WAIT_UNTIL,
-    BLOCK_STOP_ALL,
-    BLOCK_REPEAT_UNTIL,
-
-    //not visible in the UI
-    MARKER_ELSE,
-    MARKER_END_IF,
-    MARKER_BEGIN_REPEAT,
-    MARKER_END_REPEAT,
-
-    //for non control blocks ( moves looks etc)
-    BLOCK_CALL_COMMAND,
-    BLOCK_CALL_CONDITION,
+    BLOCK_WAIT,BLOCK_REPEAT,BLOCK_FOREVER,BLOCK_IF,BLOCK_IF_ELSE,
+    BLOCK_WAIT_UNTIL,BLOCK_STOP_ALL,BLOCK_REPEAT_UNTIL,
+    MARKER_ELSE,MARKER_END_IF,MARKER_BEGIN_REPEAT,MARKER_END_REPEAT,
+    BLOCK_CALL_COMMAND,BLOCK_CALL_CONDITION_CONTROL_NONE
 };
 
-//the struct which we need to use for each order
-struct Operator_Block {
-        Control_Block_Type type; //wait if repeat etc
-    int valueI=0; // int parameter for amount of repeat
-    double valueF=0.0;  //double parameter for the amount of waiting
-    CommandFn commandFn=nullptr; //for excucatable commands (eg;move 10 steps)
-    ConditionFn conditionFn=nullptr; //for conditions (eg : if,wait_until)
-    int jumpTo=-1;
+struct Control_Data {
+    Control_Block_Type type;
+    int valueI=0;
+    double valueF=0.0;
+    int jumpTO=-1;
+    CommandFn commandFn=nullptr;
+    ConditionFn conditionFn=nullptr;
 };
-//wathchdog for checking the infinite loops and avoiding errors and hang
-bool CheckWatchdog(
-    ExucationContext& ctx,
-    int limit=10000) {
-    ctx.wathdogCounter++;
 
-    if (ctx.watchdogCounter>limit) {
-        ctx.isRunning=false;
-        return true;
+struct DraggableControl {
+    SDL_Texture* texture=nullptr;
+    SDL_Rect rect = {0,0,0,0};
+    int id=-1;
+    int parentID=-1;
+    Control_Block_Type type;
+
+    bool dragging=false;
+    int offsetX=0,offsetY=0;
+
+    string inputValue="10";
+    bool dropdownOpen=false;
+    vector<string> options;
+    int selectedOption=0;
+
+    void updatePoistion(int nx,int ny) {
+        rect.x=nx;
+        rect.y=ny;
     }
-    return false;
+};
+static vector<DraggableControl> controlWorkspace;
+static vector<DraggableControl> controlMenu;
+static map<int,Control_Data> controlRuntime;
+static int globalCtrlID=2000;
+
+inline bool isPointInRect(int x,int y,SDL_Rect r) {
+    return x>= r.x && x<= r.x+r.w && y>= r.y && y<= r.y+r.h;
 }
 
-//control blocks (4.5.2 in the project doc)
-void WAIT_BLOCK(Operator_Block& blc,ExucationContext&ctx) {
-    SDL_Delay((Uint32)(blc.valueF*1000));
-}
+inline bool PreprocessControlFlow(vector<Control_Data>& script) {
+    int ifStack[500], ifTop=-1;
+    int repStack[500], repTop=-1;
 
-void WAIT_UNTIL_BLOCK(Operator_Block& blc,ExucationContext&ctx) {
-    if (!blc.conditionFn) return; //if the condition does not apply dont do anything
-    while (!blc.conditionFn(ctx)&&ctx.isRunning && !ctx.stopAll) {
-        SDL_Delay(10); //else wait (with the three coniditons true: apllying conditions + running scrips + not stopped)
-    }
-}
-
-void IF_BLOCK(Operator_Block& blc,ExucationContext&ctx,int& ip,vector<Operator_Block>& prog) {
-    if (!blc.conditionFn(ctx)) {
-        ip=blc.jumpTo; //if the condition does not apply it jumps from the if
-    }
-}
-
-void ELSE_BLOCK(Operator_Block& blc,int& ip) {
-    ip=blc.jumpTo;
-}
-
-void END_REPEAT_BLOCK(Operator_Block& blc,ExucationContext&ctx, int &ip,vector<Operator_Block>&prog) {
-    int beginIndex=blc.jumpTo;
-    if (prog[beginIndex].type==BLOCK_REPEAT) {
-        Block& rep=prog[beginIndex];
-        rep.valueI--;
-        if (rep.valueI>0) {
-            ip=beginIndex-1;
+    for(int i=0;i<(int)script.size();i++) {
+        if(script[i].type == BLOCK_IF) {
+            ifStack[++ifTop]=i;
         }
-        //continue the loop until valueI is over
-    }
-}
-
-void FOREVER_BLOCK(Operator_Block& blc,ExucationContext& ctx) {
-while (ctx.isRunning && !ctx.stopAll) {
-    SDL_Delay(1); //infinite loop
-}
-}
-
-void STOP_ALL_BLOCK(ExucationContext& ctx) {
-    ctx.stopAll=true; //stopping the entire scratch project
-}
-void REPEAT_UNTIL_BLOCK(Operator_Block& blc,ExucationContext& ctx,int& ip,vector<Operator_Block>&prog){
-    if (!blc.conditionFn(ctx)) {
-        ip=blc.jumpTo; //a conditional loop
-    }
-}
-
-void CALL_COMMAND(Operator_Block& blc,ExucationContext& ctx) {
-    if (blc.commandFn) blc.commandFn(ctx);
-}
-
-void CALL_CONDITION(Operator_Block& blc,ExucationContext& ctx,int& ip,vector<Operator_Block>&prog) {
-    if (!blc.conditionFn(ctx)) {
-        ip=blc.jumpTo;
-    }
-}
-//preprocessing (4.5.1 in the project doc)
-bool PreprocessScript(
-    vector<Operator_Block>&prog) {
-
-    int ifStack[1000];
-    int ifTop=-1;
-
-    int repeatStack[1000];
-    int repeatTop=-1;
-
-    for (int i=0;i<(int)prog.size();i++) {
-        Operator_Block &blck=prog[i];
-        //IF Algorithm (matching the IF and ELSE and END together)
-        if (blck.type==BLOCK_IF) {
-            ifTop++;
-            ifStack[ifTop]=i;
-        }
-        else if (blck.type==MARKER_ELSE) {
+        else if(script[i].type == MARKER_ELSE) {
             if (ifTop<0) return false;
-            int ifIndex=ifStack[ifTop];
-            prog[ifIndex].jumpTo=i;
-            ifStack[ifTop]=i;
+            script[ifStack[ifTop]].jumpTO=i;
+            ifStack[ifTop] = i;
         }
-        else if (blck.type==MARKER_END_IF) {
+        else if(script[i].type == MARKER_END_IF) {
             if (ifTop<0) return false;
-            int openIndex=ifStack[ifTop];
-            ifTop--;
-
-            prog[openIndex].jumpTo=i;
+            script[ifStack[ifTop--]].jumpTO=i;
         }
-
-        //REPEAT Algorithm (matching the begining and end)
-        else if (blck.type==MARKER_BEGIN_REPEAT) {
-            repeatTop++;
-            repeatStack[repeatTop]=i;
-
+        else if(script[i].type == BLOCK_REPEAT || script[i].type == BLOCK_FOREVER) {
+            repStack[++repTop]=i;
         }
-        else if (blck.type==MARKER_END_REPEAT) {
-            if (repeatTop<0) return false;
-            int beginIndex=repeatStack[repeatTop];
-            repeatTop--;
-
-            prog[beginIndex].jumpTo=i;
-            prog[i].jumpTo=beginIndex;
+        else if (script[i].type == MARKER_END_REPEAT) {
+            if (repTop<0) return false;
+            int start=repStack[repTop--];
+            script[start].jumpTO=i;
+            script[i].jumpTO=start;
         }
     }
-    if (ifTop!=-1) return false;
-    if (repeatTop!=-1) return false;
-    return true;
+    return (ifTop==-1 && repTop==-1);
 }
 
+inline void HandleControlEvents(SDL_Event &e,int mx,int my) {
+    if (e.type==SDL_MOUSEBUTTONDOWN) {
+        for (int i=controlWorkspace.size()-1;i>=0;i--) {
+            if (isPointInRect(mx,my,controlWorkspace[i].rect)) {
+                controlWorkspace[i].dragging=true;
+                controlWorkspace[i].offsetX=mx-controlWorkspace[i].rect.x;
+                controlWorkspace[i].offsetY=my-controlWorkspace[i].rect.y;
+
+                DraggableControl temp=controlWorkspace[i];
+                controlWorkspace.erase(controlWorkspace.begin()+i);
+                controlWorkspace.push_back(temp);
+                return;
+            }
+        }
+    }
+    if (e.type==SDL_MOUSEBUTTONUP) {
+        for (auto& b:controlWorkspace) {
+            if (b.dragging) {
+                b.dragging=false;
+
+                for (auto& target:controlWorkspace) {
+                    if (b.id==target.id) continue;
+                    if ((abs(b.rect.x-target.rect.x)<30) && abs(b.rect.y-(target.rect.y+target.rect.h-6)<30)) {
+                        b.rect.x=target.rect.x;
+                        b.rect.y=target.rect.y+target.rect.h-6;
+                        b.parentID=target.id;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    if (e.type==SDL_MOUSEMOTION) {
+        for (int i=0;i<controlWorkspace.size();i++) {
+            if (controlWorkspace[i].dragging) {
+                int dx=(mx-controlWorkspace[i].offsetX) - controlWorkspace[i].rect.x;
+                int dy=(my-controlWorkspace[i].offsetY) - controlWorkspace[i].rect.y;
+
+                vector<int> moveList;
+                moveList.push_back(controlWorkspace[i].id);
+
+                controlWorkspace[i].rect.x+=dx;
+                controlWorkspace[i].rect.y+=dy;
+
+                bool foundNew=true;
+                while (foundNew) {
+                    foundNew=false;
+                    for (auto& child: controlWorkspace) {
+                        if (find(moveList.begin(),moveList.end(),child.parentID)!=moveList.end() &&
+                            find(moveList.begin(),moveList.end(),child.id)==moveList.end()){
+                            child.rect.x+=dx;
+                        child.rect.y+=dy;
+                        moveList.push_back(child.id);
+                        foundNew=true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+inline void RenderControlSystem(SDL_Renderer* ren) {
+    for (auto& b:controlWorkspace) {
+        SDL_RenderCopy(ren,b.texture,NULL,&b.rect);
+        if (b.dropdownOpen) {
+
+        }
+    }
+}
+
+
+
+#endif //SCRATCH_PROJECT_CONTROLORDERS_H
